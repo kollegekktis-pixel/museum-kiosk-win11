@@ -14,5 +14,27 @@
     "ru": "При Турсынове делопроизводство перевели на государственный язык. Согласно истории колледжа, в этот период трудоустройство выпускников достигло 100 процентов.",
     "kk": "Турсынов басқарған кезде іс жүргізу мемлекеттік тілге көшірілді. Колледж тарихы туралы құжатта осы кезеңде түлектердің барлығы жұмысқа орналасқаны көрсетілген.",
     "en": "Under Tursynov, the school switched its administrative records to Kazakh. The college history records that graduate employment reached 100 per cent during this period."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "01.jpg": {
+      "ru": "Коллективное фото",
+      "kk": "Ұжымдық фотосурет",
+      "en": "Group photograph"
+    },
+    "02.jpg": {
+      "ru": "Учебные кабинеты и оборудование",
+      "kk": "Оқу кабинеттері мен жабдықтар",
+      "en": "Classrooms and equipment"
+    },
+    "03.jpg": {
+      "ru": "Из фотоальбома лицея",
+      "kk": "Лицейдің фотоальбомынан",
+      "en": "From the lyceum photo album"
+    }
+  },
+  "photo_source": {
+    "document": "College_History_Slideshow.pdf",
+    "page": 20
   }
 }

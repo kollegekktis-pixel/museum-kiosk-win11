@@ -14,5 +14,22 @@
     "ru": "При Калачёвой учебное заведение получило звание «Училище высокой культуры». В кризисные 1990-е директор вместе с педагогами и родителями отстаивала учебные корпуса. Училище открыло подготовку парикмахеров, бухгалтеров, секретарей-референтов и телерадиомехаников.",
     "kk": "Калачёва басқарған кезде оқу орны «Училище высокой культуры» атағын алды. 1990 жылдардағы дағдарыста директор педагогтермен және ата-аналармен бірге оқу ғимараттарын сақтап қалуға атсалысты. Шаштараз, бухгалтер, хатшы-референт және телерадиомеханик мамандықтары ашылды.",
     "en": "Under Kalachyova the institution earned the title “School of High Culture”. During the crisis of the 1990s she worked with teachers and parents to preserve the buildings. The school introduced courses in hairdressing, accounting, secretarial work and television and radio repair."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "01.jpg": {
+      "ru": "Учебный корпус",
+      "kk": "Оқу ғимараты",
+      "en": "School building"
+    },
+    "02.jpg": {
+      "ru": "Стенд «Наши передовики»",
+      "kk": "«Наши передовики» стенді",
+      "en": "School honours display"
+    }
+  },
+  "photo_source": {
+    "document": "College_History_Slideshow.pdf",
+    "page": 11
   }
 }

@@ -14,5 +14,22 @@
     "ru": "В годы руководства Зиненко развивалась профессиональная подготовка и продолжалась традиция конкурсов. В 1981 году воспитанницы училища заняли весь пьедестал на республиканском конкурсе. Елена Линник получила третье место на Всесоюзном конкурсе в Перми.",
     "kk": "Зиненко басқарған жылдары кәсіптік даярлық дамып, шеберлік байқаулары жалғасты. 1981 жылы училище шәкірттері республикалық байқауда үш жүлделі орынды иеленді. Елена Линник Пермьдегі бүкілодақтық байқауда үшінші орын алды.",
     "en": "Vocational training and skills competitions continued under Zinenko. In 1981 the school’s students took all three podium places at a republican competition. Elena Linnik finished third in an All-Union competition in Perm."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "01.jpg": {
+      "ru": "Оформление учебного корпуса",
+      "kk": "Оқу ғимаратының безендірілуі",
+      "en": "School building decoration"
+    },
+    "02.jpg": {
+      "ru": "Выступление на сцене",
+      "kk": "Сахнадағы өнер көрсету",
+      "en": "A stage performance"
+    }
+  },
+  "photo_source": {
+    "document": "College_History_Slideshow.pdf",
+    "page": 9
   }
 }

@@ -14,5 +14,27 @@
     "ru": "Цаплин принял руководство училищем в 1964 году. После реорганизации в ГПТУ № 19 учащиеся осваивали профессию швеи-мотористки. Базами практики служили объединение «Карагандаодежда» и Абайская швейная фабрика.",
     "kk": "Цаплин училищені 1964 жылы басқарды. № 19 қалалық кәсіптік-техникалық училищеде оқушылар тігінші-моторист мамандығын меңгерді. Олар «Карагандаодежда» бірлестігі мен Абай тігін фабрикасында тәжірибеден өтті.",
     "en": "Tsaplin took charge in 1964. At Vocational School No. 19, students learned to operate industrial sewing machines and trained at Karagandaodezhda and the Abay garment factory."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "01.jpg": {
+      "ru": "Здание училища",
+      "kk": "Училище ғимараты",
+      "en": "School building"
+    },
+    "02.jpg": {
+      "ru": "Учащиеся за партами",
+      "kk": "Парта басындағы оқушылар",
+      "en": "Students at their desks"
+    },
+    "03.jpg": {
+      "ru": "В учебном кабинете",
+      "kk": "Оқу кабинетінде",
+      "en": "In the classroom"
+    }
+  },
+  "photo_source": {
+    "document": "College_History_Slideshow.pdf",
+    "page": 4
   }
 }

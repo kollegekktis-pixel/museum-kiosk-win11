@@ -14,5 +14,27 @@
     "ru": "В начале 2000-х годов Шатинов руководил Профессиональной школой № 19. Программы обновляли с учётом потребностей работодателей. Команда учебного салона красоты успешно выступила на областном конкурсе.",
     "kk": "2000 жылдардың басында Шатинов № 19 кәсіптік мектепті басқарды. Оқу бағдарламалары жұмыс берушілердің сұранысына сай жаңартылды. Мектептің сұлулық салонының командасы облыстық байқауда табысқа жетті.",
     "en": "Shatinov led Vocational School No. 19 in the early 2000s. Courses were adapted to employers’ needs, and the school’s beauty salon team performed successfully at a regional competition."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "01.jpg": {
+      "ru": "Экспозиция работ",
+      "kk": "Жұмыстар көрмесі",
+      "en": "Exhibition of work"
+    },
+    "02.jpg": {
+      "ru": "Показ моделей на сцене",
+      "kk": "Сахнадағы киім үлгілерінің көрсетілімі",
+      "en": "Fashion show on stage"
+    },
+    "03.jpg": {
+      "ru": "Групповое фото",
+      "kk": "Топтық фотосурет",
+      "en": "Group photograph"
+    }
+  },
+  "photo_source": {
+    "document": "College_History_Slideshow.pdf",
+    "page": 19
   }
 }
