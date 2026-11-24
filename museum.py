@@ -40,8 +40,10 @@ import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 from collections import OrderedDict
+from contextlib import contextmanager
 
-from PyQt6.QtCore import Qt, QTimer, QEvent, QSize, QPoint, QRect, QSaveFile, QIODevice, QRectF, pyqtSignal
+from PyQt6.QtCore import (Qt, QTimer, QEvent, QSize, QPoint, QRect, QSaveFile, QIODevice, QRectF,
+                          QEasingCurve, QVariantAnimation, pyqtSignal)
 from PyQt6.QtGui import (QPixmap, QImage, QImageReader, QPainter, QColor, QFont, QKeySequence, QShortcut,
                          QPainterPath, QLinearGradient, QBrush, QPen, QFontMetrics)
 from PyQt6.QtWidgets import (
@@ -447,6 +449,67 @@ class Speaker:
 
 
 # ----------------------------------------------------------------- виджеты
+class NavigationTransition(QWidget):
+    """Плавно убирает предыдущий кадр. Касания сразу получает новый экран."""
+
+    def __init__(self, kiosk):
+        super().__init__(kiosk)
+        self.kiosk = kiosk
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.hide()
+        self.frame = QPixmap()
+        self.offset = QPoint()
+        self.animation = QVariantAnimation(self)
+        self.animation.setStartValue(0.0)
+        self.animation.setEndValue(1.0)
+        self.animation.setDuration(220)
+        self.animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
+        self.animation.valueChanged.connect(lambda _: self.update())
+        self.animation.finished.connect(self.clear)
+        hints = QApplication.styleHints()
+        self.accessibility = hints.accessibility() if hasattr(hints, "accessibility") else None
+        if hasattr(self.accessibility, "motionPreferenceChanged"):
+            self.accessibility.motionPreferenceChanged.connect(lambda _: self.clear())
+
+    def clear(self):
+        self.animation.stop()
+        self.hide()
+        self.frame = QPixmap()
+
+    def motion_enabled(self):
+        if self.kiosk.theme.hc:
+            return False
+        if hasattr(self.accessibility, "motionPreference"):
+            preference = self.accessibility.motionPreference()
+            return preference != type(preference).ReducedMotion
+        return bool(self.style().styleHint(QStyle.StyleHint.SH_Widget_Animate))
+
+    @contextmanager
+    def switch(self, surface, dx=0, dy=0):
+        if not surface.isVisible() or not self.motion_enabled():
+            self.clear()
+            yield
+            return
+        bounds = QRect(surface.mapTo(self.kiosk, QPoint()), surface.size())
+        # Снимок включает уже видимую часть прерванного перехода и фон страницы.
+        frame = self.kiosk.grab(bounds)
+        self.clear()
+        yield
+        self.setGeometry(bounds)
+        self.frame = frame
+        self.offset = QPoint(round(dx * self.kiosk.scale), round(dy * self.kiosk.scale))
+        self.raise_()
+        self.show()
+        self.animation.start()
+
+    def paintEvent(self, event):
+        progress = self.animation.currentValue()
+        painter = QPainter(self)
+        painter.setOpacity(1.0 - progress)
+        painter.drawPixmap(self.offset * progress, self.frame)
+
+
 class PhotoView(QWidget):
     tapped = pyqtSignal()
     swiped = pyqtSignal(int)  # -1 назад, +1 вперёд
@@ -504,9 +567,10 @@ class PhotoView(QWidget):
 class GalleryPanel(QWidget):
     tapped = pyqtSignal()
 
-    def __init__(self, cache: PixCache, scale: float, radius=22):
+    def __init__(self, cache: PixCache, scale: float, transition, radius=22):
         super().__init__()
         self.cache = cache
+        self.transition = transition
         self.photos = []
         self.captions = {}
         self.index = 0
@@ -571,8 +635,9 @@ class GalleryPanel(QWidget):
         self.counter.setVisible(multi)
 
     def step(self, d):
-        if self.photos:
-            self.show_index(self.index + d)
+        if len(self.photos) > 1:
+            with self.transition.switch(self.view, dx=-48 * d):
+                self.show_index(self.index + d)
 
 
 class Overlay(QWidget):
@@ -583,7 +648,8 @@ class Overlay(QWidget):
         super().__init__(parent)
         self.setObjectName("overlay")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-        self.gallery = GalleryPanel(cache, scale, radius=0)
+        self.transition = parent.transition
+        self.gallery = GalleryPanel(cache, scale, self.transition, radius=0)
         self.gallery.tapped.connect(self._close)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(int(20 * scale), int(20 * scale), int(20 * scale), int(20 * scale))
@@ -595,7 +661,8 @@ class Overlay(QWidget):
         self.hide()
 
     def _close(self):
-        self.hide()
+        with self.transition.switch(self):
+            self.hide()
         self.closed.emit()
 
     def resizeEvent(self, e):
@@ -943,6 +1010,7 @@ class Kiosk(QWidget):
         self.setWindowTitle("Museum")
         if cfg.get("hide_cursor"):
             self.setCursor(Qt.CursorShape.BlankCursor)
+        self.transition = NavigationTransition(self)
         self._build_ui()
         self.apply_theme()
         self.set_language(self.lang)
@@ -1044,7 +1112,7 @@ class Kiosk(QWidget):
         self.list.setSpacing(0)
         self.list.setItemDelegate(PersonDelegate(s, self.thumbs, self.theme, self.list))
         QScroller.grabGesture(self.list.viewport(), QScroller.ScrollerGestureType.LeftMouseButtonGesture)
-        self.list.currentRowChanged.connect(self._on_row)
+        self.list.currentItemChanged.connect(self._on_item)
         lv.addWidget(self.list, 1)
 
         self.exit_btn = QPushButton()
@@ -1066,7 +1134,7 @@ class Kiosk(QWidget):
         for code, label in (("ru", "РУС"), ("kk", "ҚАЗ"), ("en", "ENG")):
             b = self._tool_button(label, True)
             b.setMinimumWidth(int(100 * s))
-            b.clicked.connect(lambda _, c=code: self.set_language(c))
+            b.clicked.connect(lambda _, c=code: self.select_language(c))
             self.lang_btns[code] = b
             bar.addWidget(b)
         bar.addStretch(1)
@@ -1292,6 +1360,7 @@ class Kiosk(QWidget):
         """
 
     def apply_theme(self):
+        self.transition.clear()
         self.setStyleSheet(self._style())
         self.list.scheduleDelayedItemsLayout()
         self.list.viewport().update()
@@ -1301,6 +1370,7 @@ class Kiosk(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
+        self.transition.clear()
         self.overlay.setGeometry(self.rect())
         self.dim.setGeometry(self.rect())
 
@@ -1336,6 +1406,13 @@ class Kiosk(QWidget):
         self.history_reader.setHtml("".join(parts))
 
     # --- язык
+    def select_language(self, lang):
+        if lang == self.lang:
+            self.lang_btns[lang].setChecked(True)
+            return
+        with self.transition.switch(self.stack):
+            self.set_language(lang)
+
     def set_language(self, lang):
         if lang not in LANGS:
             lang = "ru"
@@ -1420,10 +1497,13 @@ class Kiosk(QWidget):
             self.history_read.setText(txt)
 
     # --- поведение
-    def _on_row(self, row):
+    def _on_item(self, current, previous):
         self.speaker.stop()
+        row = self.list.row(current)
+        previous_row = self.list.row(previous)
         self.home_btn.setChecked(row < 0)
-        self.show_person(row)
+        with self.transition.switch(self.stack, dy=-22 if row > previous_row else 22):
+            self.show_person(row)
         if self.narrator and 0 <= row < len(self.people):
             self.read_current()
 
@@ -1456,10 +1536,11 @@ class Kiosk(QWidget):
         self.stack.setCurrentIndex(1)
 
     def _show_overlay(self, photos, captions, index):
-        self.overlay.gallery.set_photos(photos, captions, index)
-        self.overlay.setGeometry(self.rect())
-        self.overlay.show()
-        self.overlay.raise_()
+        with self.transition.switch(self):
+            self.overlay.gallery.set_photos(photos, captions, index)
+            self.overlay.setGeometry(self.rect())
+            self.overlay.show()
+            self.overlay.raise_()
 
     def open_overlay(self, index=0):
         row = self.list.currentRow()
@@ -1474,6 +1555,7 @@ class Kiosk(QWidget):
 
     def go_home(self):
         """Бездействие: сброс к начальному экрану, языку и настройкам доступности."""
+        self.transition.clear()
         self.speaker.stop()
         self.overlay.hide()
         self.narrator = False
@@ -1524,6 +1606,7 @@ class Kiosk(QWidget):
     def ask_password(self):
         if self._pin_open:
             return
+        self.transition.clear()
         self._pin_open = True
         self.dim.setGeometry(self.rect())
         self.dim.show()
