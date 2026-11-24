@@ -1,0 +1,21 @@
+name: Build Windows kiosk
+on: push
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyQt6 pyinstaller
+      - run: python -m PyInstaller --noconsole --onefile museum.py
+      - shell: pwsh
+        run: |
+          Copy-Item dist/museum.exe .
+          Compress-Archive -Path museum.exe,museum.py,data,README.txt,build.bat,run_test.bat -DestinationPath museum_kiosk_win11_x64.zip
+          gh release create v1.0 museum_kiosk_win11_x64.zip --title "Музей колледжа" --notes "Windows x64"
+        env:
+          GH_TOKEN: ${{ github.token }}
