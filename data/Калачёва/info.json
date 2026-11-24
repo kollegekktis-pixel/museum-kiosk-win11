@@ -5,15 +5,11 @@
     "kk": "Калачёва Евгения Николаевна",
     "en": "Yevgeniya Kalachyova"
   },
-  "years": {
-    "ru": "С 1986 года",
-    "kk": "1986 жылдан бастап",
-    "en": "From 1986"
-  },
+  "years": "1980–2000",
   "description": {
-    "ru": "При Калачёвой учебное заведение получило звание «Училище высокой культуры». В кризисные 1990-е директор вместе с педагогами и родителями отстаивала учебные корпуса. Училище открыло подготовку парикмахеров, бухгалтеров, секретарей-референтов и телерадиомехаников.",
-    "kk": "Калачёва басқарған кезде оқу орны «Училище высокой культуры» атағын алды. 1990 жылдардағы дағдарыста директор педагогтермен және ата-аналармен бірге оқу ғимараттарын сақтап қалуға атсалысты. Шаштараз, бухгалтер, хатшы-референт және телерадиомеханик мамандықтары ашылды.",
-    "en": "Under Kalachyova the institution earned the title “School of High Culture”. During the crisis of the 1990s she worked with teachers and parents to preserve the buildings. The school introduced courses in hairdressing, accounting, secretarial work and television and radio repair."
+    "ru": "В 1982 году училище получило звание «Училище высокой культуры». В 1992 году коллектив переехал в корпуса на улице Зональной, 75. В трудные 1990-е Евгения Николаевна вместе с родителями отстаивала учебные здания. В 1998 году открылись группы парикмахеров и бухгалтеров, в 1999-м — секретарей-референтов и телерадиомехаников.",
+    "kk": "1982 жылы училище «Жоғары мәдениет училищесі» атағын алды. 1992 жылы ұжым Зональная көшесі, 75 мекенжайындағы ғимараттарға көшті. Қиын 1990 жылдары Евгения Николаевна ата-аналармен бірге оқу ғимараттарын сақтап қалуға күш салды. 1998 жылы шаштараздар мен есепшілер, 1999 жылы референт-хатшылар мен телерадиомеханиктер даярлайтын топтар ашылды.",
+    "en": "In 1982 the school received a distinction for its cultural life. In 1992 it moved to buildings at 75 Zonalnaya Street. During the difficult 1990s Yevgeniya Kalachyova and parents worked to preserve the teaching buildings. Hairdressing and accounting groups opened in 1998, followed by secretarial and radio and television repair courses in 1999."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -26,10 +22,42 @@
       "ru": "Стенд «Наши передовики»",
       "kk": "«Наши передовики» стенді",
       "en": "School honours display"
+    },
+    "stand-063.jpg": {
+      "ru": "Занятие по ремонту бытовой техники",
+      "kk": "Тұрмыстық техниканы жөндеу сабағы",
+      "en": "A class in household appliance repair"
+    },
+    "stand-067.jpg": {
+      "ru": "Корпус на Зональной, 75. Переезд в 1992 году",
+      "kk": "Зональная көшесі, 75. Училище 1992 жылы көшті",
+      "en": "The building at 75 Zonalnaya Street, where the school moved in 1992"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
     "page": 11
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 11
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 11
+    },
+    "portrait.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 11
+    },
+    "stand-063.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 11
+    },
+    "stand-067.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 11
+    }
   }
 }

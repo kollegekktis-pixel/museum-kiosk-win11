@@ -200,6 +200,11 @@ class Person:
     def years(self, lang):
         return tr(self.info.get("years"), lang)
 
+    def period_text(self, lang):
+        years = self.years(lang)
+        label = tr(self.info.get("period_label"), lang) or I18N[lang]["years"]
+        return f"{label}: {years}" if years else ""
+
     def description(self, lang):
         return tr(self.info.get("description"), lang)
 
@@ -476,7 +481,7 @@ class PhotoView(QWidget):
         path = QPainterPath()
         path.addRoundedRect(QRectF(self.rect()), self.radius, self.radius)
         p.setClipPath(path)
-        p.fillRect(self.rect(), QColor("#080c18"))
+        p.fillRect(self.rect(), QColor("#08172c"))
         if self._scaled is not None:
             x = (self.width() - self._scaled.width()) // 2
             y = (self.height() - self._scaled.height()) // 2
@@ -645,16 +650,16 @@ class PortraitView(QWidget):
                 p.fillPath(path, QColor("#000000"))
             else:
                 g = QLinearGradient(r.topLeft(), r.bottomRight())
-                g.setColorAt(0, QColor("#1e2a52"))
-                g.setColorAt(1, QColor("#2a2060"))
+                g.setColorAt(0, QColor("#102e65"))
+                g.setColorAt(1, QColor("#0e72b8"))
                 p.fillPath(path, QBrush(g))
             f = QFont("Segoe UI")
             f.setPixelSize(int(110 * s))
             f.setBold(True)
             p.setFont(f)
-            p.setPen(QColor("#ffe600") if hc else QColor(251, 191, 36, 200))
+            p.setPen(QColor("#ffe600") if hc else QColor("#d3aa58"))
             p.drawText(r, Qt.AlignmentFlag.AlignCenter, self.initials)
-        p.setPen(QPen(QColor("#ffe600") if hc else QColor(251, 191, 36, 200), (6 if hc else 3) * s))
+        p.setPen(QPen(QColor("#ffe600") if hc else QColor("#d3aa58"), (6 if hc else 3) * s))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
@@ -709,7 +714,7 @@ class ThumbDelegate(QStyledItemDelegate):
             p.drawText(band.adjusted(14 * s, 0, -14 * s, -8 * s), A_LEFT_BOTTOM,
                        fm.elidedText(str(cap), Qt.TextElideMode.ElideRight, int(w - 28 * s)))
         p.setClipping(False)
-        p.setPen(QPen(QColor("#ffffff") if hc else QColor(255, 255, 255, 45), (3 if hc else 1.5)))
+        p.setPen(QPen(QColor("#ffffff") if hc else QColor("#b09258"), (3 if hc else 1.5)))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(clip)
         p.restore()
@@ -743,23 +748,23 @@ class PersonDelegate(QStyledItemDelegate):
                 p.fillPath(card, QColor("#ffe600"))
             else:
                 g = QLinearGradient(r.topLeft(), r.bottomRight())
-                g.setColorAt(0, QColor("#fcd34d"))
-                g.setColorAt(1, QColor("#f59e0b"))
+                g.setColorAt(0, QColor("#ffedc3"))
+                g.setColorAt(1, QColor("#e7ba65"))
                 p.fillPath(card, QBrush(g))
         else:
             if hc:
                 p.fillPath(card, QColor("#000000"))
                 p.setPen(QPen(QColor("#ffffff"), 3))
             else:
-                p.fillPath(card, QColor(255, 255, 255, 16))
-                p.setPen(QPen(QColor(255, 255, 255, 28), 1))
+                p.fillPath(card, QColor(255, 255, 255, 20))
+                p.setPen(QPen(QColor(183, 218, 255, 95), 1))
             p.drawPath(card)
 
         # --- аватар: фото директора или инициалы
         d = 84 * s
         circle = QRectF(r.left() + 16 * s, r.center().y() - d / 2, d, d)
         dark = QColor("#000000") if hc else QColor("#0f172a")
-        ring = QColor("#ffe600") if hc else QColor("#f59e0b")
+        ring = QColor("#ffe600") if hc else QColor("#e7ba65")
         if portrait:
             pm = self.thumbs.get(portrait, int(d), int(d), 0.12)
             clip = QPainterPath()
@@ -812,7 +817,7 @@ class PersonDelegate(QStyledItemDelegate):
             if sel:
                 p.setPen(QColor("#000000") if hc else QColor(15, 23, 42, 210))
             else:
-                p.setPen(QColor("#ffe600") if hc else QColor("#fbbf24"))
+                p.setPen(QColor("#ffe600") if hc else QColor("#ffda90"))
             p.drawText(QRectF(x, y0 + name_h + gap, w, years_h), A_LEFT_TOP,
                        yfm.elidedText(years, Qt.TextElideMode.ElideRight, int(w)))
         p.restore()
@@ -874,8 +879,8 @@ class PinDialog(QDialog):
     def paintEvent(self, e):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        p.setBrush(QColor("#000000") if self.hc else QColor("#111a33"))
-        p.setPen(QPen(QColor("#ffe600") if self.hc else QColor("#f59e0b"), 4 if self.hc else 3))
+        p.setBrush(QColor("#000000") if self.hc else QColor("#0c2a53"))
+        p.setPen(QPen(QColor("#ffe600") if self.hc else QColor("#e7ba65"), 4 if self.hc else 3))
         r = 28 * self.scale
         p.drawRoundedRect(QRectF(self.rect()).adjusted(2, 2, -2, -2), r, r)
 
@@ -1226,53 +1231,57 @@ class Kiosk(QWidget):
                 err="#ff9a9a", pin_bg="#000000", disp="#1a1a1a")
         else:
             P = SimpleNamespace(
-                root="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #102628, stop:0.6 #103638, stop:1 #0d2529)",
-                left="rgba(255,255,255,10)", left_b="rgba(255,255,255,26)", text="#e2e8f0", title="#ffffff",
-                acc="#fbbf24", muted="#94a3b8", card="rgba(255,255,255,14)", card_b="rgba(255,255,255,30)",
-                pill="rgba(251,191,36,34)", pill_b="rgba(251,191,36,110)", btn="rgba(255,255,255,12)",
-                btn_b="rgba(255,255,255,50)", cnt="rgba(255,255,255,26)", nav="rgba(255,255,255,30)",
-                nav_b="rgba(255,255,255,50)", key="rgba(255,255,255,22)", dim="rgba(0,0,0,190)", bw=1,
-                badge="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #fcd34d, stop:1 #f59e0b)",
-                badge_t="#0f172a", chk="#f59e0b", chk_t="#0f172a", press="#f59e0b", press_t="#0f172a",
-                err="#fca5a5", pin_bg="#111a33", disp="rgba(255,255,255,14)")
+                root="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #fcf7ec, stop:0.65 #fffdf8, stop:1 #e5f2fc)",
+                left="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #091f4b, stop:0.58 #103d84, stop:1 #07559e)",
+                left_b="#d8ac54", text="#203957", title="#102f63", acc="#785213", muted="#4a627a",
+                card="#fffefa", card_b="#cfbd97", pill="#f9efd8", pill_b="#be9856", btn="#fffefa",
+                btn_b="#9eb0c5", cnt="#18375c", nav="#193f6f", nav_b="#77a4d2", key="#183f72",
+                dim="rgba(4,16,38,210)", bw=1, badge_t="#102f63", chk="#134f99", chk_t="#ffffff",
+                press="#08619f", press_t="#ffffff", err="#ffb8ae", disp="#18375c")
+        side_text = "#ffffff"
+        side_accent = "#ffe600" if self.theme.hc else "#ffdb8b"
+        side_button = P.btn if self.theme.hc else "#153e73"
+        side_border = P.btn_b if self.theme.hc else "#6c94c2"
+        hero_font = "'Segoe UI'" if self.theme.hc else "Georgia, 'Times New Roman'"
         return f"""
         QWidget {{ background:transparent; color:{P.text}; font-family:'Segoe UI'; }}
         #root {{ background:{P.root}; }}
-        #left {{ background:{P.left}; border-right:{P.bw}px solid {P.left_b}; }}
+        #left {{ background:{P.left}; border-right:{max(P.bw, f(3))}px solid {P.left_b}; }}
         #badge {{ background:#ffffff; border-radius:{f(24)}px; font-size:{f(42)}px; color:{P.badge_t}; }}
-        #title {{ font-size:{ff(34)}px; font-weight:700; color:{P.title}; }}
-        #subtitle {{ font-size:{ff(15)}px; font-weight:600; color:{P.acc}; }}
+        #title {{ font-size:{ff(34)}px; font-weight:700; color:{side_text}; }}
+        #subtitle {{ font-size:{ff(15)}px; font-weight:600; color:{side_accent}; }}
         QListWidget {{ background:transparent; outline:0; border:none; }}
-        #exitBtn {{ background:{P.btn}; border:{P.bw}px solid {P.btn_b}; border-radius:{f(20)}px;
-                   font-size:{ff(24)}px; font-weight:600; color:{P.text}; }}
+        #exitBtn {{ background:{side_button}; border:{P.bw}px solid {side_border}; border-radius:{f(20)}px;
+                   font-size:{ff(24)}px; font-weight:600; color:{side_text}; }}
         #exitBtn:pressed {{ background:#ef4444; border-color:#ef4444; color:#ffffff; }}
         #tool {{ background:{P.btn}; border:{P.bw}px solid {P.btn_b}; border-radius:{f(18)}px;
                 font-size:{ff(22)}px; font-weight:600; color:{P.text}; padding:0 {f(18)}px; }}
         #tool:checked {{ background:{P.chk}; color:{P.chk_t}; border-color:{P.chk}; }}
+        #left #tool:checked {{ border:2px solid {side_accent}; }}
         #tool:pressed {{ background:{P.press}; color:{P.press_t}; border-color:{P.press}; }}
         #era {{ color:{P.acc}; font-size:{ff(20)}px; font-weight:700; }}
-        #storyHeading {{ color:{P.title}; font-size:{ff(46)}px; font-weight:700; }}
+        #storyHeading {{ font-family:{hero_font}; color:{P.title}; font-size:{ff(46)}px; font-weight:700; }}
         #collegeStory {{ background:{P.card}; border:{P.bw}px solid {P.card_b}; border-radius:{f(20)}px; padding:{f(26)}px; }}
         #primary {{ background:{P.chk}; color:{P.chk_t}; border:2px solid {P.chk}; padding:0 {f(28)}px; border-radius:{f(18)}px; font-size:{ff(23)}px; font-weight:700; }}
         #welcomeIcon {{ font-size:{f(130)}px; }}
         #welcome {{ font-size:{ff(36)}px; color:{P.muted}; }}
-        #name {{ font-size:{ff(52)}px; font-weight:700; color:{P.title}; }}
+        #name {{ font-family:{hero_font}; font-size:{ff(52)}px; font-weight:700; color:{P.title}; }}
         #years {{ font-size:{ff(26)}px; font-weight:600; color:{P.acc}; background:{P.pill};
                  border:{P.bw}px solid {P.pill_b}; border-radius:{f(22)}px; padding:{f(8)}px {f(22)}px; }}
         #card {{ background:{P.card}; border:{P.bw}px solid {P.card_b}; border-radius:{f(26)}px; }}
         #cardHead {{ font-size:{ff(16)}px; font-weight:700; color:{P.acc}; }}
         #desc {{ font-size:{ff(25)}px; color:{P.text}; }}
         QScrollArea {{ background:transparent; border:none; }}
-        #caption {{ font-size:{ff(22)}px; color:{P.text}; }}
-        #counter {{ font-size:{ff(19)}px; font-weight:600; color:{P.text}; background:{P.cnt};
+        #caption {{ font-size:{ff(22)}px; color:{side_text}; }}
+        #counter {{ font-size:{ff(19)}px; font-weight:600; color:{side_text}; background:{P.cnt};
                    border-radius:{f(16)}px; padding:{f(4)}px {f(18)}px; }}
         #nav {{ background:{P.nav}; color:#ffffff; border:{P.bw}px solid {P.nav_b};
                border-radius:{f(45)}px; font-size:{f(46)}px; font-weight:600; }}
         #nav:pressed {{ background:{P.press}; color:{P.press_t}; border-color:{P.press}; }}
-        #overlay {{ background:#05070f; }}
+        #overlay {{ background:#08172c; }}
         #dim {{ background:{P.dim}; }}
         #pinTitle {{ font-size:{f(32)}px; font-weight:700; color:#ffffff; }}
-        #pinDisplay {{ font-size:{f(44)}px; color:{P.acc}; min-height:{f(70)}px; background:{P.disp};
+        #pinDisplay {{ font-size:{f(44)}px; color:{side_accent}; min-height:{f(70)}px; background:{P.disp};
                       border-radius:{f(16)}px; }}
         #pinStatus {{ font-size:{f(20)}px; color:{P.err}; }}
         #key {{ background:{P.key}; font-size:{f(36)}px; border-radius:{f(18)}px;
@@ -1310,9 +1319,9 @@ class Kiosk(QWidget):
         chapters = self.college.get("chapters", [])
         esc = lambda value: html.escape(tr(value, self.lang))
         px = lambda n: max(1, round(n * self.scale * self.theme.mult))
-        accent = "#ffe600" if self.theme.hc else "#f8c55a"
-        ink = "#ffffff" if self.theme.hc else "#f5f3eb"
-        body = "#ffffff" if self.theme.hc else "#d1e1dc"
+        accent = "#ffe600" if self.theme.hc else "#785213"
+        ink = "#ffffff" if self.theme.hc else "#102f63"
+        body = "#ffffff" if self.theme.hc else "#203957"
         self.story_period.setVisible(bool(chapters))
         self.story_heading.setText(tr(self.college.get("heading"), self.lang) or self.T("welcome"))
         parts = []
@@ -1351,7 +1360,10 @@ class Kiosk(QWidget):
         self.list.clear()
         for p in self.people:
             it = QListWidgetItem()
-            it.setData(Qt.ItemDataRole.UserRole, (p.name(lang), p.years(lang), p.portrait))
+            list_period = p.years(lang)
+            if p.info.get("period_label"):
+                list_period += " · " + tr(p.info["period_label"], lang)
+            it.setData(Qt.ItemDataRole.UserRole, (p.name(lang), list_period, p.portrait))
             self.list.addItem(it)
         if 0 <= row < len(self.people):
             self.list.setCurrentRow(row)
@@ -1379,9 +1391,9 @@ class Kiosk(QWidget):
 
     def person_text(self, p):
         parts = [p.name(self.lang)]
-        y = p.years(self.lang)
-        if y:
-            parts.append(f"{self.T('years')}: {y}")
+        period = p.period_text(self.lang)
+        if period:
+            parts.append(period)
         d = p.description(self.lang)
         if d:
             parts.append(d)
@@ -1422,9 +1434,10 @@ class Kiosk(QWidget):
         p = self.people[row]
         lang = self.lang
         self.name_lbl.setText(p.name(lang))
-        years = p.years(lang)
-        self.years_lbl.setText((self.T("years") + ":  " + years) if years else "")
-        self.years_lbl.setVisible(bool(years))
+        period = p.period_text(lang)
+        self.years_lbl.setWordWrap(len(period) > 35)
+        self.years_lbl.setText(period)
+        self.years_lbl.setVisible(bool(period))
         paras = [html.escape(x.strip()) for x in p.description(lang).split("\n") if x.strip()]
         self.desc.setText("".join(f"<p style='margin:0 0 {int(14 * self.scale)}px 0; line-height:140%'>{x}</p>"
                                   for x in paras))
@@ -1592,7 +1605,7 @@ class CropPreview(QWidget):
 
     def paintEvent(self, event):
         p = QPainter(self)
-        p.fillRect(self.rect(), QColor("#122425"))
+        p.fillRect(self.rect(), QColor("#103661"))
         if not self.image.isNull():
             p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
             p.drawImage(self.image_rect(), self.image)

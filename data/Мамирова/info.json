@@ -6,13 +6,53 @@
     "en": "Meruert Mamirova"
   },
   "years": {
-    "ru": "С 2023 года по настоящее время",
-    "kk": "2023 жылдан қазіргі уақытқа дейін",
+    "ru": "С 2023 года",
+    "kk": "2023 жылдан бері",
     "en": "2023–present"
   },
   "description": {
-    "ru": "Мамирова возглавляет колледж с 2023 года. При ней колледж организовал бесплатные курсы по программе JUMYS TAP и городской чемпионат JasSkills для школьников. В учебный процесс вводят программы 3D-моделирования. В 2026 году при поддержке партии AMANAT и Управления образования открылась новая спортивная площадка.",
-    "kk": "Мамирова колледжді 2023 жылдан бері басқарады. Колледж JUMYS TAP бағдарламасы бойынша тегін курстар мен оқушыларға арналған қалалық JasSkills чемпионатын ұйымдастырды. Оқу үдерісіне 3D-модельдеу бағдарламалары енгізілуде. 2026 жылы AMANAT партиясы мен Білім басқармасының қолдауымен жаңа спорт алаңы ашылды.",
-    "en": "Mamirova has led the college since 2023. It has organised free JUMYS TAP courses and a city JasSkills championship for schoolchildren, and introduced 3D modelling software into teaching. In 2026 a new sports ground opened with support from AMANAT and the education authority."
+    "ru": "Меруерт Магруповна окончила КарГУ в 1995 году по специальности учителя биологии и химии. С 2016 по 2023 год возглавляла Саранский технический колледж. С 2023 года руководит Карагандинским колледжем технологии и сервиса.\nВ 2025 году открылась спортивная площадка. В том же году Аружан Курамыс заняла второе место по «Технологиям моды» на WorldSkills Kazakhstan, а Зере Каирова — третье по работе с кожей на «Абилимпиксе». В 2026 году студенты осваивали цифровое моделирование.",
+    "kk": "Меруерт Магруповна 1995 жылы ҚарМУ-ды биология және химия мұғалімі мамандығы бойынша бітірді. 2016–2023 жылдары Саран техникалық колледжін басқарды. 2023 жылдан бері Қарағанды технология және сервис колледжінің директоры.\n2025 жылы спорт алаңы ашылды. Сол жылы Аружан Құрамыс WorldSkills Kazakhstan чемпионатында «Сән технологиясы» бойынша екінші, ал Зере Қаирова «Абилимпикс» чемпионатында «Терімен жұмыс» бойынша үшінші орын алды. 2026 жылы студенттер цифрлық модельдеуді меңгерді.",
+    "en": "Meruert Mamirova graduated from Karaganda State University in 1995 as a biology and chemistry teacher. She headed Saran Technical College from 2016 to 2023 and has led Karaganda College of Technology and Service since 2023.\nA new sports ground opened in 2025. That year Aruzhan Kuramys took silver in Fashion Technology at WorldSkills Kazakhstan, and Zere Kairova placed third in leatherwork at Abilympics. In 2026 students trained in digital modelling."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "stand-006.jpg": {
+      "ru": "Занятие по цифровому моделированию, 2026",
+      "kk": "Цифрлық модельдеу сабағы, 2026",
+      "en": "A digital modelling class, 2026"
+    },
+    "stand-008.jpg": {
+      "ru": "Открытие спортивной площадки, 2025",
+      "kk": "Спорт алаңының ашылуы, 2025",
+      "en": "Opening of the sports ground, 2025"
+    },
+    "stand-013.jpg": {
+      "ru": "Встреча представителей Китая, 2025",
+      "kk": "Қытайдан келген өкілдерді қарсы алу, 2025",
+      "en": "Welcoming visitors from China, 2025"
+    }
+  },
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 1
+  },
+  "photo_sources": {
+    "portrait.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 1
+    },
+    "stand-006.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 1
+    },
+    "stand-008.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 1
+    },
+    "stand-013.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 1
+    }
   }
 }

@@ -5,15 +5,11 @@
     "kk": "Турсынов Рамазан Умирзакович",
     "en": "Ramazan Tursynov"
   },
-  "years": {
-    "ru": "Период профессиональной школы",
-    "kk": "Кәсіптік мектеп кезеңі",
-    "en": "Vocational school period"
-  },
+  "years": "2004–2010",
   "description": {
-    "ru": "При Турсынове делопроизводство перевели на государственный язык. Согласно истории колледжа, в этот период трудоустройство выпускников достигло 100 процентов.",
-    "kk": "Турсынов басқарған кезде іс жүргізу мемлекеттік тілге көшірілді. Колледж тарихы туралы құжатта осы кезеңде түлектердің барлығы жұмысқа орналасқаны көрсетілген.",
-    "en": "Under Tursynov, the school switched its administrative records to Kazakh. The college history records that graduate employment reached 100 per cent during this period."
+    "ru": "Рамазан Умирзакович руководил профессиональным лицеем № 19. Делопроизводство перевели на казахский язык. В 2008–2009 годах студенты и мастера лицея заняли призовые места на республиканском конкурсе по парикмахерскому и швейному делу. По истории колледжа, в этот период трудоустройство выпускников достигло 100 процентов.",
+    "kk": "Рамазан Умирзакович № 19 кәсіптік лицейді басқарды. Іс қағаздары қазақ тілінде жүргізіле бастады. 2008–2009 жылдары лицей студенттері мен шеберлері шаштараз және тігін ісі бойынша республикалық байқауда жүлделі орындар алды. Колледж тарихы туралы очеркте осы кезеңде түлектердің барлығы жұмысқа орналасқаны айтылады.",
+    "en": "Ramazan Tursynov headed Vocational Lyceum No. 19 and oversaw the switch to Kazakh for administrative records. In 2008–2009 students and instructors won prizes at the national competition for hairdressers and sewing professionals. The college history records that all graduates found work during this period."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -31,10 +27,37 @@
       "ru": "Из фотоальбома лицея",
       "kk": "Лицейдің фотоальбомынан",
       "en": "From the lyceum photo album"
+    },
+    "stand-052.jpg": {
+      "ru": "Республиканский конкурс парикмахеров и швей, 2008–2009",
+      "kk": "Шаштараздар мен тігіншілердің республикалық байқауы, 2008–2009",
+      "en": "National hairdressing and sewing competition, 2008–2009"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
-    "page": 20
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 8
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 20
+    },
+    "03.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 20
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 20
+    },
+    "portrait.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    },
+    "stand-052.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    }
   }
 }

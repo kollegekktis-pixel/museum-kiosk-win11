@@ -5,14 +5,50 @@
     "kk": "Дюсембаев Бекен Аблакасович",
     "en": "Beken Dyusembayev"
   },
-  "years": {
-    "ru": "Период лицея и переход к статусу колледжа",
-    "kk": "Лицей кезеңі және колледж мәртебесіне көшу",
-    "en": "From lyceum to college"
-  },
+  "years": "2010–2014",
   "description": {
-    "ru": "При Дюсембаеве лицей был преобразован в колледж. Постановление акимата Карагандинской области № 66/6 от 2 февраля 2012 года закрепило новое название учебного заведения.",
-    "kk": "Дюсембаев басқарған кезде лицей колледжге айналды. Оқу орнының жаңа атауы Қарағанды облысы әкімдігінің 2012 жылғы 2 ақпандағы № 66/6 қаулысымен бекітілді.",
-    "en": "The lyceum became a college under Dyusembayev. Resolution No. 66/6 of the Karaganda regional administration, dated 2 February 2012, established the institution’s new name."
+    "ru": "Бекен Аблакасович руководил лицеем в годы его преобразования в колледж. Новое название закрепило постановление акимата Карагандинской области № 66/6 от 2 февраля 2012 года. В 2012–2013 годах для производственного обучения приобрели оборудование. В архиве сохранились снимки празднования Наурыза и конкурса молодых специалистов 2014 года.",
+    "kk": "Бекен Аблакасович лицей колледжге айналған кезеңде оқу орнын басқарды. Жаңа атау Қарағанды облысы әкімдігінің 2012 жылғы 2 ақпандағы № 66/6 қаулысымен бекітілді. 2012–2013 жылдары өндірістік оқытуға қажетті жабдықтар алынды. Мұрағатта 2014 жылғы Наурыз мерекесі мен жас мамандар сайысының фотосуреттері сақталған.",
+    "en": "Beken Dyusembayev led the institution through its transition from lyceum to college. Regional resolution No. 66/6 of 2 February 2012 established its new name. In 2012–2013 the workshops received equipment for practical training. The archive includes photographs of the 2014 Nauryz celebration and young professionals’ competition."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "stand-048.jpg": {
+      "ru": "Оборудование для производственного обучения, 2012–2013",
+      "kk": "Өндірістік оқытуға арналған жабдықтар, 2012–2013",
+      "en": "Equipment for practical training, 2012–2013"
+    },
+    "stand-049.jpg": {
+      "ru": "Празднование Наурыза, 2014",
+      "kk": "Наурыз мерекесі, 2014",
+      "en": "Nauryz celebrations, 2014"
+    },
+    "stand-051.jpg": {
+      "ru": "Конкурс молодых специалистов, 2014",
+      "kk": "Жас мамандар сайысы, 2014",
+      "en": "Young professionals’ competition, 2014"
+    }
+  },
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 8
+  },
+  "photo_sources": {
+    "portrait.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    },
+    "stand-048.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    },
+    "stand-049.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    },
+    "stand-051.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 8
+    }
   }
 }

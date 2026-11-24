@@ -5,15 +5,11 @@
     "kk": "Зиненко Екатерина Алексеевна",
     "en": "Yekaterina Zinenko"
   },
-  "years": {
-    "ru": "С 1976 года",
-    "kk": "1976 жылдан бастап",
-    "en": "From 1976"
-  },
+  "years": "1975–1980",
   "description": {
-    "ru": "В годы руководства Зиненко развивалась профессиональная подготовка и продолжалась традиция конкурсов. В 1981 году воспитанницы училища заняли весь пьедестал на республиканском конкурсе. Елена Линник получила третье место на Всесоюзном конкурсе в Перми.",
-    "kk": "Зиненко басқарған жылдары кәсіптік даярлық дамып, шеберлік байқаулары жалғасты. 1981 жылы училище шәкірттері республикалық байқауда үш жүлделі орынды иеленді. Елена Линник Пермьдегі бүкілодақтық байқауда үшінші орын алды.",
-    "en": "Vocational training and skills competitions continued under Zinenko. In 1981 the school’s students took all three podium places at a republican competition. Elena Linnik finished third in an All-Union competition in Perm."
+    "ru": "Екатерина Алексеевна возглавляла училище № 19 с 1975 по 1980 год. К тому времени конкурсы профессионального мастерства уже стали частью учёбы. Выпускницы возвращались в училище в новом качестве. На архивном снимке среди членов конкурсного жюри — выпускница училища В. А. Столопова, депутат Верховного Совета.",
+    "kk": "Екатерина Алексеевна 1975–1980 жылдары № 19 училищені басқарды. Кәсіби шеберлік байқаулары оқу дәстүріне айналды. Түлектер де училище өміріне атсалысты. Мұрағаттағы суретте байқау қазыларының арасында училище түлегі, Жоғарғы Кеңес депутаты В. А. Столопова отыр.",
+    "en": "Yekaterina Zinenko led School No. 19 from 1975 to 1980. Skills competitions were an established part of student life, and former students returned as judges. One archive photograph shows graduate V. A. Stolopova, a deputy of the Supreme Council, on the judging panel."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -26,10 +22,33 @@
       "ru": "Выступление на сцене",
       "kk": "Сахнадағы өнер көрсету",
       "en": "A stage performance"
+    },
+    "stand-080.jpg": {
+      "ru": "Выпускница В. А. Столопова в составе жюри",
+      "kk": "Қазылар алқасындағы училище түлегі В. А. Столопова",
+      "en": "Graduate V. A. Stolopova on the judging panel"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
-    "page": 9
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 13
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 9
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 9
+    },
+    "portrait.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 9
+    },
+    "stand-080.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 13
+    }
   }
 }

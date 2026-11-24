@@ -5,15 +5,11 @@
     "kk": "Нсанова Сара Жанадиловна",
     "en": "Sara Nsanova"
   },
-  "years": {
-    "ru": "С 1966 года",
-    "kk": "1966 жылдан бастап",
-    "en": "From 1966"
-  },
+  "years": "1965–1975",
   "description": {
-    "ru": "Заслуженный работник профтехобразования Казахской ССР. При Нсановой у училища появился собственный спортивный зал, работали восемь мастерских и четырнадцать кабинетов. В 1975 году училище организовало республиканский конкурс профессионального мастерства. Для учащихся действовал летний лагерь «Кос-Кудук».",
-    "kk": "Қазақ КСР кәсіптік-техникалық білім беру саласының еңбек сіңірген қызметкері. Нсанова басқарған кезде училищенің өз спорт залы ашылып, сегіз шеберхана мен он төрт кабинет жұмыс істеді. 1975 жылы училище республикалық кәсіби шеберлік байқауын ұйымдастырды. Оқушылар жазда «Кос-Кудук» лагерінде демалды.",
-    "en": "An honoured vocational educator of the Kazakh SSR, Nsanova oversaw the school’s first gymnasium. Its facilities grew to eight workshops and fourteen classrooms. The school hosted a national skills competition in 1975 and ran the Kos-Kuduk summer camp."
+    "ru": "Сара Жанадиловна была удостоена звания заслуженного работника профтехобразования Казахской ССР и медали «За трудовое отличие». При ней у училища появился собственный спортивный зал, работали восемь мастерских и четырнадцать учебных кабинетов. В 1975 году училище приняло республиканский конкурс профессионального мастерства.",
+    "kk": "Сара Жанадиловна Қазақ КСР кәсіптік-техникалық білім беру саласының еңбек сіңірген қызметкері атанып, еңбегі үшін медальмен марапатталды. Оның тұсында училищенің өз спорт залы ашылып, сегіз шеберхана мен он төрт оқу кабинеті жұмыс істеді. 1975 жылы училищеде республикалық кәсіби шеберлік байқауы өтті.",
+    "en": "Sara Nsanova was honoured for her work in vocational education in the Kazakh SSR and received the Medal for Distinguished Labour. During her tenure the school opened its own gym and had eight workshops and fourteen classrooms. It hosted a national skills competition in 1975."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -26,10 +22,42 @@
       "ru": "Занятие в мастерской",
       "kk": "Шеберханадағы сабақ",
       "en": "A workshop class"
+    },
+    "stand-039.jpg": {
+      "ru": "Победительницы конкурсов Гейне и Корчагина",
+      "kk": "Байқау жеңімпаздары Гейне мен Корчагина",
+      "en": "Competition winners Geine and Korchagina"
+    },
+    "stand-042.jpg": {
+      "ru": "Республиканский конкурс в училище, 1975",
+      "kk": "Училищедегі республикалық байқау, 1975",
+      "en": "National competition at the school, 1975"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
     "page": 7
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 7
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 7
+    },
+    "portrait.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 7
+    },
+    "stand-039.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 7
+    },
+    "stand-042.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 7
+    }
   }
 }

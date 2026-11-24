@@ -47,16 +47,33 @@
       }
     },
     {
-      "period": "1990–2012",
+      "period": "1982–2012",
       "title": {
         "ru": "Как сохранили училище",
         "kk": "Училище қалай сақталды",
         "en": "Keeping the school open"
       },
       "text": {
-        "ru": "В 1990-е годы предприятия, где проходила практика, переживали кризис. Педагоги и родители отстояли учебные корпуса. Рядом со швейным делом появились новые специальности, в том числе бухгалтерское и парикмахерское дело. 2 февраля 2012 года постановлением областного акимата № 66/6 лицей был преобразован в колледж.",
-        "kk": "1990 жылдары оқушылар тәжірибеден өтетін кәсіпорындар дағдарысқа ұшырады. Ұстаздар мен ата-аналар оқу ғимараттарын сақтап қалды. Тігін ісімен қатар бухгалтерлік есеп пен шаштараз ісі оқытыла бастады. 2012 жылғы 2 ақпанда облыс әкімдігінің № 66/6 қаулысымен лицей колледжге айналды.",
-        "en": "In the 1990s the companies that hosted apprentices faced a crisis. Teachers and parents worked to keep the school buildings. Accounting and hairdressing joined the sewing courses. On 2 February 2012 regional resolution No. 66/6 transformed the lyceum into a college."
+        "ru": "В 1982 году училище получило звание «Училище высокой культуры». В 1992 году коллектив переехал на улицу Зональную, 75. В годы кризиса педагоги и родители отстояли учебные здания. В 1998 году к швейным профессиям добавились парикмахерское дело и бухгалтерский учёт. В 1999 году начали готовить секретарей-референтов и телерадиомехаников. 2 февраля 2012 года лицей стал колледжем.",
+        "kk": "1982 жылы училище «Жоғары мәдениет училищесі» атағын алды. 1992 жылы ұжым Зональная көшесі, 75 мекенжайына көшті. Дағдарыс жылдарында педагогтер мен ата-аналар оқу ғимараттарын сақтап қалды. 1998 жылы шаштараздар мен есепшілерді, 1999 жылы референт-хатшылар мен телерадиомеханиктерді даярлау басталды. 2012 жылғы 2 ақпанда лицей колледжге айналды.",
+        "en": "In 1982 the school received a distinction for its cultural life. In 1992 it moved to 75 Zonalnaya Street. Teachers and parents kept the teaching buildings open through the economic crisis. Hairdressing and accounting groups opened in 1998, followed by secretarial and radio and television repair courses in 1999. On 2 February 2012 the lyceum became a college."
+      }
+    },
+    {
+      "period": "1983–2025",
+      "title": {
+        "ru": "Выпускницы возвращаются в мастерские",
+        "kk": "Түлектер шеберханаға оралады",
+        "en": "Graduates return to the workshops"
+      },
+      "text": {
+        "ru": "В 1983–1986 годах Людмила Лебединская училась швейному производству в училище № 19. После работы швеёй в «Карагандаодежде» и учёбы на техника-технолога она вернулась в 1994 году мастером. С 2024 года работает методистом колледжа. Баян Сакенова, ученица 1987–1989 годов, начинала швеёй-мотористкой на Абайской фабрике. В 2025 году она стала международным экспертом TurkicSkills по технологиям моды.",
+        "kk": "Людмила Лебединская 1983–1986 жылдары № 19 училищеде тігін өндірісін оқыды. «Қарағанды киім» бірлестігінде тігінші болып жұмыс істеп, техник-технолог мамандығын алды. 1994 жылы училищеге шебер болып оралды. 2024 жылдан бастап колледж әдіскері. Баян Сакенова 1987–1989 жылдары училищеде оқып, Абай тігін фабрикасында тігінші-моторист болып еңбек жолын бастады. 2025 жылы TurkicSkills чемпионатында сән технологиясы бойынша халықаралық сарапшы болды.",
+        "en": "Lyudmila Lebedinskaya studied garment production at School No. 19 from 1983 to 1986. After working as a seamstress at Karagandaodezhda and qualifying as a technician, she returned as an instructor in 1994. In 2024 she became a teaching adviser at the college. Bayan Sakenova studied there from 1987 to 1989 and started out as a sewing machine operator at the Abay factory. In 2025 she served as an international Fashion Technology expert at TurkicSkills."
+      },
+      "source": {
+        "document": "На проверку стнеды (1).pdf",
+        "page": 14
       }
     },
     {

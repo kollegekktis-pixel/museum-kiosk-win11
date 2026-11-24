@@ -5,14 +5,41 @@
     "kk": "Магзиев Жұмағали Диярович",
     "en": "Zhumagali Magziyev"
   },
-  "years": {
-    "ru": "2016–2023",
-    "kk": "2016–2023",
-    "en": "2016–2023"
-  },
+  "years": "2014–2023",
   "description": {
-    "ru": "Отличник народного просвещения КазССР, магистр исторических наук. В 2021 году по проекту «Жас маман» колледжу выделили 256,7 млн тенге. После реконструкции открылся центр компетенций «Технологии моды» с компьютеризированными швейными комплексами и лазерным оборудованием. Колледж развивал инклюзивное образование.",
-    "kk": "Қазақ КСР халық ағарту ісінің үздігі, тарих ғылымдарының магистрі. 2021 жылы «Жас маман» жобасы бойынша колледжге 256,7 млн теңге бөлінді. Қайта жаңартудан кейін компьютерлендірілген тігін кешендері мен лазерлік жабдықтары бар «Сән технологиялары» құзыреттілік орталығы ашылды. Колледж инклюзивті білім беруді дамытты.",
-    "en": "Magziyev held a master’s degree in history and was honoured for his work in public education. In 2021 the Zhas Maman project allocated 256.7 million tenge to the college. Following renovation, the Fashion Technology competence centre opened with computerised sewing systems and laser equipment. The college also expanded inclusive education."
+    "ru": "Жұмағали Диярович возглавлял колледж с 2014 по 2023 год. В 2019 году студентка Жанайым Максут выступила на чемпионате мира WorldSkills в Казани. В 2021 году по проекту «Жас маман» колледжу выделили 256,7 млн тенге. Открылся центр компетенций «Технологии моды» с компьютеризированными швейными комплексами и лазерным оборудованием. В 2022 году Вероника Вечканова представляла колледж на мировом чемпионате в Хельсинки.",
+    "kk": "Жұмағали Диярович колледжді 2014–2023 жылдары басқарды. 2019 жылы студент Жанайым Максут Қазандағы WorldSkills әлем чемпионатына қатысты. 2021 жылы «Жас маман» жобасы бойынша колледжге 256,7 млн теңге бөлінді. Компьютерлендірілген тігін кешендері мен лазерлік жабдықтары бар «Сән технологиясы» құзыреттілік орталығы ашылды. 2022 жылы Вероника Вечканова Хельсинкидегі әлем чемпионатында колледж атынан өнер көрсетті.",
+    "en": "Zhumagali Magziyev led the college from 2014 to 2023. In 2019 student Zhanaiym Maksut competed at WorldSkills Kazan. In 2021 the Zhas Maman project allocated 256.7 million tenge to the college. The Fashion Technology competence centre opened with computerised sewing systems and laser equipment. In 2022 Veronika Vechkanova represented the college at the world championship in Helsinki."
+  },
+  "portrait": "portrait.jpg",
+  "captions": {
+    "stand-025.jpg": {
+      "ru": "Открытие центра «Технологии моды», 2021",
+      "kk": "«Сән технологиясы» орталығының ашылуы, 2021",
+      "en": "Opening of the Fashion Technology centre, 2021"
+    },
+    "stand-028.jpg": {
+      "ru": "Оборудование для подготовки обувщиков, 2016–2022",
+      "kk": "Аяқ киім ісі мамандығының жабдықтары, 2016–2022",
+      "en": "Equipment for footwear training, 2016–2022"
+    }
+  },
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 3
+  },
+  "photo_sources": {
+    "portrait.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 3
+    },
+    "stand-025.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 3
+    },
+    "stand-028.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 3
+    }
   }
 }

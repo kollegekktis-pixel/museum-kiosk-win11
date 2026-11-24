@@ -1,19 +1,15 @@
 {
   "order": 5,
   "name": {
-    "ru": "Шатинов Серик Турсынович",
-    "kk": "Шатинов Серик Турсынович",
-    "en": "Serik Shatinov"
+    "ru": "Шатинов Серікбол Тұрсынұлы",
+    "kk": "Шатинов Серікбол Тұрсынұлы",
+    "en": "Serikbol Tursynuly Shatinov"
   },
-  "years": {
-    "ru": "Начало 2000-х · профессиональная школа",
-    "kk": "2000 жылдардың басы · кәсіптік мектеп",
-    "en": "Early 2000s · vocational school"
-  },
+  "years": "2002–2004",
   "description": {
-    "ru": "В начале 2000-х годов Шатинов руководил Профессиональной школой № 19. Программы обновляли с учётом потребностей работодателей. Команда учебного салона красоты успешно выступила на областном конкурсе.",
-    "kk": "2000 жылдардың басында Шатинов № 19 кәсіптік мектепті басқарды. Оқу бағдарламалары жұмыс берушілердің сұранысына сай жаңартылды. Мектептің сұлулық салонының командасы облыстық байқауда табысқа жетті.",
-    "en": "Shatinov led Vocational School No. 19 in the early 2000s. Courses were adapted to employers’ needs, and the school’s beauty salon team performed successfully at a regional competition."
+    "ru": "Шатинов руководил профессиональной школой № 19. В швейных мастерских учащиеся осваивали крой и пошив одежды. Практические занятия вели и для будущих парикмахеров. В 2004 году группа парикмахеров заняла второе место на областном конкурсе.",
+    "kk": "Шатинов № 19 кәсіптік мектепті басқарды. Тігін шеберханаларында оқушылар киім пішіп, тігуді үйренді. Болашақ шаштараздар да тәжірибелік сабақтарға қатысты. 2004 жылы шаштараздар тобы облыстық байқауда екінші орын алды.",
+    "en": "Shatinov led Vocational School No. 19. Students learned to cut and sew garments in the workshops, while trainee hairdressers practised their trade in the salon. In 2004 the hairdressing group took second place in a regional competition."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -31,10 +27,46 @@
       "ru": "Групповое фото",
       "kk": "Топтық фотосурет",
       "en": "Group photograph"
+    },
+    "stand-056.jpg": {
+      "ru": "Группа парикмахеров, 2004",
+      "kk": "Шаштараздар тобы, 2004",
+      "en": "The hairdressing group, 2004"
+    },
+    "stand-059.jpg": {
+      "ru": "Швейная мастерская",
+      "kk": "Тігін шеберханасы",
+      "en": "The sewing workshop"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
-    "page": 19
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 9
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 19
+    },
+    "03.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 19
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 19
+    },
+    "portrait.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 9
+    },
+    "stand-056.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 9
+    },
+    "stand-059.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 9
+    }
   }
 }

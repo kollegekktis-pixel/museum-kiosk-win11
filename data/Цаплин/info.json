@@ -5,15 +5,11 @@
     "kk": "Цаплин Бронислав Александрович",
     "en": "Bronislav Tsaplin"
   },
-  "years": {
-    "ru": "С 1964 года",
-    "kk": "1964 жылдан бастап",
-    "en": "From 1964"
-  },
+  "years": "1956–1966",
   "description": {
-    "ru": "Цаплин принял руководство училищем в 1964 году. После реорганизации в ГПТУ № 19 учащиеся осваивали профессию швеи-мотористки. Базами практики служили объединение «Карагандаодежда» и Абайская швейная фабрика.",
-    "kk": "Цаплин училищені 1964 жылы басқарды. № 19 қалалық кәсіптік-техникалық училищеде оқушылар тігінші-моторист мамандығын меңгерді. Олар «Карагандаодежда» бірлестігі мен Абай тігін фабрикасында тәжірибеден өтті.",
-    "en": "Tsaplin took charge in 1964. At Vocational School No. 19, students learned to operate industrial sewing machines and trained at Karagandaodezhda and the Abay garment factory."
+    "ru": "Строительная школа № 35 открылась в Караганде в 1956 году. Первое здание училища № 19 находилось на улице Ипподромной, 5а. После реорганизации в сентябре 1962 года училище готовило швей-мотористок для объединения «Карагандаодежда», а затем и для Абайской швейной фабрики. В альбоме сохранился снимок выпуска 23-й группы за 1963 год.",
+    "kk": "1956 жылы Қарағандыда № 35 құрылыс мектебі ашылды. № 19 училищенің алғашқы ғимараты Ипподромная көшесі, 5а мекенжайында орналасқан. 1962 жылғы қыркүйектегі қайта ұйымдастырудан кейін училище «Қарағанды киім» бірлестігіне, кейін Абай тігін фабрикасына тігінші-мотористер даярлады. Альбомда 1963 жылғы 23-топ түлектерінің суреті сақталған.",
+    "en": "Construction School No. 35 opened in Karaganda in 1956. The first building of Vocational School No. 19 stood at 5a Ippodromnaya Street. After reorganisation in September 1962, the school trained sewing machine operators for Karagandaodezhda and later for the Abay garment factory. The album includes a photograph of Group 23 graduating in 1963."
   },
   "portrait": "portrait.jpg",
   "captions": {
@@ -31,10 +27,51 @@
       "ru": "В учебном кабинете",
       "kk": "Оқу кабинетінде",
       "en": "In the classroom"
+    },
+    "stand-032.jpg": {
+      "ru": "Выпуск 23-й группы, 1963",
+      "kk": "23-топ түлектері, 1963",
+      "en": "Group 23 graduates, 1963"
+    },
+    "stand-035.jpg": {
+      "ru": "Первое здание училища № 19, Ипподромная, 5а",
+      "kk": "№ 19 училищенің алғашқы ғимараты, Ипподромная көшесі, 5а",
+      "en": "The first school building, 5a Ippodromnaya Street"
     }
   },
-  "photo_source": {
-    "document": "College_History_Slideshow.pdf",
-    "page": 4
+  "period_label": {
+    "ru": "Период стенда",
+    "kk": "Стенд қамтитын кезең",
+    "en": "Exhibit period"
+  },
+  "date_source": {
+    "document": "На проверку стнеды (1).pdf",
+    "page": 5
+  },
+  "photo_sources": {
+    "01.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 4
+    },
+    "03.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 4
+    },
+    "02.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 4
+    },
+    "portrait.jpg": {
+      "document": "College_History_Slideshow.pdf",
+      "page": 4
+    },
+    "stand-032.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 5
+    },
+    "stand-035.jpg": {
+      "document": "На проверку стнеды (1).pdf",
+      "page": 5
+    }
   }
 }

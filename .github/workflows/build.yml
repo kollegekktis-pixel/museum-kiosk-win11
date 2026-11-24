@@ -18,6 +18,23 @@ jobs:
       - shell: pwsh
         run: |
           Copy-Item dist/museum.exe .
+          $exe = (Resolve-Path museum.exe).Path
+          $launcher = Start-Process -FilePath $exe -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(45)
+            do {
+              Start-Sleep -Seconds 1
+              $window = Get-Process -Name museum -ErrorAction SilentlyContinue |
+                Where-Object { $_.Path -eq $exe -and $_.MainWindowHandle -ne 0 -and $_.Responding }
+            } until ($window -or $launcher.HasExited -or (Get-Date) -ge $deadline)
+            if (-not $window -or -not (Test-Path config.json)) {
+              throw 'The packaged kiosk did not open a responsive window and initialise its configuration.'
+            }
+            Write-Host 'Packaged kiosk opened a responsive window on Windows.'
+          } finally {
+            Get-Process -Name museum -ErrorAction SilentlyContinue |
+              Where-Object { $_.Path -eq $exe } | Stop-Process -Force
+          }
           Compress-Archive -Path museum.exe,museum.py,data,README.txt,build.bat,run_test.bat,import_portraits.bat -DestinationPath museum_kiosk_win11_x64.zip
           $releaseFlags = @()
           if ($env:GITHUB_REF_NAME -like "*-*") { $releaseFlags += "--prerelease" }
