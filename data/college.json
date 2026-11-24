@@ -1,0 +1,89 @@
+{
+  "name": {
+    "ru": "Карагандинский колледж технологии и сервиса",
+    "kk": "Қарағанды технология және сервис колледжі",
+    "en": "Karaganda College of Technology and Service"
+  },
+  "heading": {
+    "ru": "От первых мастерских до мировых чемпионатов",
+    "kk": "Алғашқы шеберханалардан әлем чемпионаттарына дейін",
+    "en": "From the first workshops to world championships"
+  },
+  "history": {
+    "ru": "История колледжа",
+    "kk": "Колледж тарихы",
+    "en": "College history"
+  },
+  "leaders": {
+    "ru": "Руководители колледжа",
+    "kk": "Колледж басшылары",
+    "en": "College directors"
+  },
+  "chapters": [
+    {
+      "period": "1956–1962",
+      "title": {
+        "ru": "Первые мастерские",
+        "kk": "Алғашқы шеберханалар",
+        "en": "The first workshops"
+      },
+      "text": {
+        "ru": "В 1956 году в растущей Караганде открылась строительная школа № 35. В первых швейных мастерских ученицы работали на машинах с ножным приводом. В 1962 году школу преобразовали в ГПТУ № 19. Швей-мотористок готовили для «Карагандаодежды» и Абайской швейной фабрики.",
+        "kk": "1956 жылы Қарағандыда № 35 құрылыс мектебі ашылды. Алғашқы тігін шеберханаларында оқушылар аяқпен басқаратын машиналармен жұмыс істеді. 1962 жылы мектеп № 19 қалалық кәсіптік-техникалық училищеге айналды. Мұнда «Карагандаодежда» бірлестігі мен Абай тігін фабрикасына тігінші-мотористер даярланды.",
+        "en": "Construction School No. 35 opened in Karaganda in 1956. In its early sewing workshops, students used treadle machines. In 1962 it became Vocational School No. 19 and began training sewing machine operators for Karagandaodezhda and the Abay garment factory."
+      }
+    },
+    {
+      "period": "1966–1981",
+      "title": {
+        "ru": "От учебного цеха до пьедестала",
+        "kk": "Шеберханадан жүлде тұғырына дейін",
+        "en": "From workshop to podium"
+      },
+      "text": {
+        "ru": "В 1966 году модели учащихся получили диплом II степени на выставке достижений народного хозяйства Казахской ССР. В конкурсе «Лучший по профессии» 1969 года участвовали 352 учащихся из 11 групп. В 1981 году воспитанницы заняли весь пьедестал республиканского конкурса. Выпускники училища составляли около 46% работников Абайской швейной фабрики в 1970–1980-е годы.",
+        "kk": "1966 жылы оқушылар жасаған киім үлгілері Қазақ КСР халық шаруашылығы жетістіктері көрмесінде ІІ дәрежелі диплом алды. 1969 жылғы кәсіби байқауға 11 топтан 352 оқушы қатысты. 1981 жылы шәкірттер республикалық байқауда үш жүлделі орынды иеленді. 1970–1980 жылдары Абай тігін фабрикасы қызметкерлерінің шамамен 46 пайызы училище түлектері болды.",
+        "en": "Student designs earned a second-degree diploma at the Kazakh SSR economic achievements exhibition in 1966. In 1969, 352 students from eleven groups entered a skills contest. In 1981 students swept the podium at a republican competition. During the 1970s and 1980s, graduates made up around 46% of the Abay garment factory workforce."
+      }
+    },
+    {
+      "period": "1990–2012",
+      "title": {
+        "ru": "Как сохранили училище",
+        "kk": "Училище қалай сақталды",
+        "en": "Keeping the school open"
+      },
+      "text": {
+        "ru": "В 1990-е годы предприятия, где проходила практика, переживали кризис. Педагоги и родители отстояли учебные корпуса. Рядом со швейным делом появились новые специальности, в том числе бухгалтерское и парикмахерское дело. 2 февраля 2012 года постановлением областного акимата № 66/6 лицей был преобразован в колледж.",
+        "kk": "1990 жылдары оқушылар тәжірибеден өтетін кәсіпорындар дағдарысқа ұшырады. Ұстаздар мен ата-аналар оқу ғимараттарын сақтап қалды. Тігін ісімен қатар бухгалтерлік есеп пен шаштараз ісі оқытыла бастады. 2012 жылғы 2 ақпанда облыс әкімдігінің № 66/6 қаулысымен лицей колледжге айналды.",
+        "en": "In the 1990s the companies that hosted apprentices faced a crisis. Teachers and parents worked to keep the school buildings. Accounting and hairdressing joined the sewing courses. On 2 February 2012 regional resolution No. 66/6 transformed the lyceum into a college."
+      }
+    },
+    {
+      "period": "2019–2025",
+      "title": {
+        "ru": "«Технологии моды» и WorldSkills",
+        "kk": "«Сән технологиялары» және WorldSkills",
+        "en": "Fashion Technology and WorldSkills"
+      },
+      "text": {
+        "ru": "В 2019 году Жанайым Максут представляла Казахстан на WorldSkills в Казани. В 2021 году колледж открыл центр компетенций «Технологии моды». Вероника Вечканова выступила в Хельсинки в 2022 году, Гульбахат Куттыбаева стала призёром республиканского чемпионата в 2023-м, а Аружан Курамыс завоевала серебро в 2025-м. Гульбахат также открыла собственную мастерскую по переработке шерсти.",
+        "kk": "2019 жылы Жанайым Максут Қазандағы WorldSkills чемпионатында Қазақстан атынан өнер көрсетті. 2021 жылы колледжде «Сән технологиялары» құзыреттілік орталығы ашылды. Вероника Вечканова 2022 жылы Хельсинкиде бақ сынады. Гульбахат Куттыбаева 2023 жылы республикалық чемпионатта жүлде алды, ал Аружан Курамыс 2025 жылы күміс медаль иеленді. Гульбахат жүн өңдейтін шеберхана да ашты.",
+        "en": "Zhanaiym Maksut represented Kazakhstan at WorldSkills Kazan in 2019. The Fashion Technology competence centre opened in 2021. Veronika Vechkanova competed in Helsinki in 2022, Gulbakhat Kuttybayeva placed at the national championship in 2023, and Aruzhan Kuramys won silver in 2025. Gulbakhat also founded a wool-processing workshop."
+      }
+    },
+    {
+      "period": "2026",
+      "title": {
+        "ru": "Семьдесят добрых дел",
+        "kk": "Жетпіс игі іс",
+        "en": "Seventy good deeds"
+      },
+      "text": {
+        "ru": "К юбилею студенты и преподаватели шьют пижамы для Дома ребёнка «Шапағат» и бесплатно стригут воспитанников школы-интерната. Школьники Караганды пробуют профессии на чемпионате JasSkills. По программе JUMYS TAP горожане бесплатно осваивают швейное и парикмахерское дело.",
+        "kk": "Мерейтойға орай студенттер мен ұстаздар «Шапағат» сәбилер үйіне пижама тігіп, мектеп-интернат тәрбиеленушілеріне тегін шаштараз қызметін көрсетеді. Қарағанды оқушылары JasSkills чемпионатында кәсіптермен танысады. Қала тұрғындары JUMYS TAP бағдарламасы арқылы тігін және шаштараз ісін тегін үйренеді.",
+        "en": "For the anniversary, students and teachers sew pyjamas for the Shapagat children’s home and give free haircuts at a boarding school. Karaganda schoolchildren explore trades at JasSkills, while residents learn sewing and hairdressing through free JUMYS TAP courses."
+      }
+    }
+  ]
+}

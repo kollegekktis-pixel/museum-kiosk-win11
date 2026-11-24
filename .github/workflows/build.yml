@@ -1,5 +1,8 @@
 name: Build Windows kiosk
-on: push
+on:
+  push:
+    tags:
+      - 'v*'
 permissions:
   contents: write
 jobs:
@@ -15,7 +18,9 @@ jobs:
       - shell: pwsh
         run: |
           Copy-Item dist/museum.exe .
-          Compress-Archive -Path museum.exe,museum.py,data,README.txt,build.bat,run_test.bat -DestinationPath museum_kiosk_win11_x64.zip
-          gh release create v1.0 museum_kiosk_win11_x64.zip --title "Музей колледжа" --notes "Windows x64"
+          Compress-Archive -Path museum.exe,museum.py,data,README.txt,build.bat,run_test.bat,import_portraits.bat -DestinationPath museum_kiosk_win11_x64.zip
+          $releaseFlags = @()
+          if ($env:GITHUB_REF_NAME -like "*-*") { $releaseFlags += "--prerelease" }
+          gh release create $env:GITHUB_REF_NAME museum_kiosk_win11_x64.zip --verify-tag --title "Музей ККТиС · $env:GITHUB_REF_NAME" --generate-notes @releaseFlags
         env:
           GH_TOKEN: ${{ github.token }}

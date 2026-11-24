@@ -28,6 +28,9 @@ import os
 import sys
 import re
 import json
+import posixpath
+import xml.etree.ElementTree as ET
+from zipfile import BadZipFile, ZipFile
 import time
 import html
 import hashlib
@@ -38,13 +41,13 @@ from pathlib import Path
 from types import SimpleNamespace
 from collections import OrderedDict
 
-from PyQt6.QtCore import Qt, QTimer, QEvent, QSize, QRectF, pyqtSignal
-from PyQt6.QtGui import (QPixmap, QImageReader, QPainter, QColor, QFont, QKeySequence, QShortcut,
+from PyQt6.QtCore import Qt, QTimer, QEvent, QSize, QPoint, QRect, QSaveFile, QIODevice, QRectF, pyqtSignal
+from PyQt6.QtGui import (QPixmap, QImage, QImageReader, QPainter, QColor, QFont, QKeySequence, QShortcut,
                          QPainterPath, QLinearGradient, QBrush, QPen, QFontMetrics)
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
     QPushButton, QListWidget, QListWidgetItem, QStackedWidget, QScrollArea,
-    QScroller, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle,
+    QScroller, QComboBox, QFileDialog, QMessageBox, QTextBrowser, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle,
 )
 
 IMG_EXT = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
@@ -913,6 +916,8 @@ class Kiosk(QWidget):
     def __init__(self, cfg, people, scale):
         super().__init__()
         self.cfg = cfg
+        college_file = DATA_DIR / "college.json"
+        self.college = json.loads(college_file.read_text(encoding="utf-8")) if college_file.is_file() else {}
         self.people = people
         self.scale = scale
         self.cache = PixCache()
@@ -997,10 +1002,16 @@ class Kiosk(QWidget):
 
         head = QHBoxLayout()
         head.setSpacing(int(16 * s))
-        badge = QLabel("🏛")
+        badge = QLabel()
         badge.setObjectName("badge")
         badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         badge.setFixedSize(int(80 * s), int(80 * s))
+        emblem = QPixmap(str(DATA_DIR / "logo.png"))
+        if not emblem.isNull():
+            badge.setPixmap(emblem.scaled(badge.size(), Qt.AspectRatioMode.KeepAspectRatio,
+                                          Qt.TransformationMode.SmoothTransformation))
+        else:
+            badge.setText("ККТиС")
         tcol = QVBoxLayout()
         tcol.setSpacing(0)
         self.title_lbl = QLabel()
@@ -1016,6 +1027,9 @@ class Kiosk(QWidget):
         lv.addLayout(head)
         lv.addSpacing(int(14 * s))
 
+        self.home_btn = self._tool_button("", True)
+        self.home_btn.clicked.connect(self.open_history)
+        lv.addWidget(self.home_btn)
         self.list = QListWidget()
         self.list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.list.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -1074,17 +1088,33 @@ class Kiosk(QWidget):
 
         welcome = QWidget()
         wl = QVBoxLayout(welcome)
-        wl.addStretch(1)
-        icon = QLabel("🏛")
-        icon.setObjectName("welcomeIcon")
-        icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.welcome_txt = QLabel()
-        self.welcome_txt.setObjectName("welcome")
-        self.welcome_txt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.welcome_txt.setWordWrap(True)
-        wl.addWidget(icon)
-        wl.addWidget(self.welcome_txt)
-        wl.addStretch(1)
+        wl.setContentsMargins(0, int(22*s), 0, int(22*s))
+        wl.setSpacing(int(18*s))
+        self.story_period = QLabel("1956 — 2026")
+        self.story_period.setObjectName("era")
+        wl.addWidget(self.story_period)
+        self.story_heading = QLabel()
+        self.story_heading.setObjectName("storyHeading")
+        self.story_heading.setWordWrap(True)
+        wl.addWidget(self.story_heading)
+        self.history_reader = QTextBrowser()
+        self.history_reader.setObjectName("collegeStory")
+        self.history_reader.setOpenExternalLinks(False)
+        self.history_reader.setFrameShape(QFrame.Shape.NoFrame)
+        QScroller.grabGesture(self.history_reader.viewport(), QScroller.ScrollerGestureType.LeftMouseButtonGesture)
+        wl.addWidget(self.history_reader, 1)
+        actions = QHBoxLayout()
+        self.history_read = self._tool_button("")
+        self.history_read.clicked.connect(self.toggle_read)
+        self.history_read.setVisible(self.speaker.available())
+        actions.addWidget(self.history_read)
+        actions.addStretch()
+        self.directors_btn = self._tool_button("")
+        self.directors_btn.setObjectName("primary")
+        self.directors_btn.clicked.connect(lambda: self.list.setCurrentRow(0))
+        self.directors_btn.setEnabled(bool(self.people))
+        actions.addWidget(self.directors_btn)
+        wl.addLayout(actions)
         self.stack.addWidget(welcome)
 
         page = QWidget()
@@ -1102,6 +1132,7 @@ class Kiosk(QWidget):
         pill_row = QHBoxLayout()
         self.years_lbl = QLabel()
         self.years_lbl.setObjectName("years")
+        self.years_lbl.setWordWrap(True)
         pill_row.addWidget(self.years_lbl)
         pill_row.addStretch(1)
 
@@ -1195,7 +1226,7 @@ class Kiosk(QWidget):
                 err="#ff9a9a", pin_bg="#000000", disp="#1a1a1a")
         else:
             P = SimpleNamespace(
-                root="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #0b1020, stop:0.6 #151a3a, stop:1 #241a4d)",
+                root="qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #102628, stop:0.6 #103638, stop:1 #0d2529)",
                 left="rgba(255,255,255,10)", left_b="rgba(255,255,255,26)", text="#e2e8f0", title="#ffffff",
                 acc="#fbbf24", muted="#94a3b8", card="rgba(255,255,255,14)", card_b="rgba(255,255,255,30)",
                 pill="rgba(251,191,36,34)", pill_b="rgba(251,191,36,110)", btn="rgba(255,255,255,12)",
@@ -1208,7 +1239,7 @@ class Kiosk(QWidget):
         QWidget {{ background:transparent; color:{P.text}; font-family:'Segoe UI'; }}
         #root {{ background:{P.root}; }}
         #left {{ background:{P.left}; border-right:{P.bw}px solid {P.left_b}; }}
-        #badge {{ background:{P.badge}; border-radius:{f(24)}px; font-size:{f(42)}px; color:{P.badge_t}; }}
+        #badge {{ background:#ffffff; border-radius:{f(24)}px; font-size:{f(42)}px; color:{P.badge_t}; }}
         #title {{ font-size:{ff(34)}px; font-weight:700; color:{P.title}; }}
         #subtitle {{ font-size:{ff(15)}px; font-weight:600; color:{P.acc}; }}
         QListWidget {{ background:transparent; outline:0; border:none; }}
@@ -1219,6 +1250,10 @@ class Kiosk(QWidget):
                 font-size:{ff(22)}px; font-weight:600; color:{P.text}; padding:0 {f(18)}px; }}
         #tool:checked {{ background:{P.chk}; color:{P.chk_t}; border-color:{P.chk}; }}
         #tool:pressed {{ background:{P.press}; color:{P.press_t}; border-color:{P.press}; }}
+        #era {{ color:{P.acc}; font-size:{ff(20)}px; font-weight:700; }}
+        #storyHeading {{ color:{P.title}; font-size:{ff(46)}px; font-weight:700; }}
+        #collegeStory {{ background:{P.card}; border:{P.bw}px solid {P.card_b}; border-radius:{f(20)}px; padding:{f(26)}px; }}
+        #primary {{ background:{P.chk}; color:{P.chk_t}; border:2px solid {P.chk}; padding:0 {f(28)}px; border-radius:{f(18)}px; font-size:{ff(23)}px; font-weight:700; }}
         #welcomeIcon {{ font-size:{f(130)}px; }}
         #welcome {{ font-size:{ff(36)}px; color:{P.muted}; }}
         #name {{ font-size:{ff(52)}px; font-weight:700; color:{P.title}; }}
@@ -1253,23 +1288,59 @@ class Kiosk(QWidget):
         self.list.viewport().update()
         self.strip.viewport().update()
         self.portrait.update()
+        self.render_history()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self.overlay.setGeometry(self.rect())
         self.dim.setGeometry(self.rect())
 
+    def open_history(self):
+        self.speaker.stop()
+        self.list.setCurrentRow(-1)
+        self.list.clearSelection()
+        self.list.scrollToTop()
+        self.stack.setCurrentIndex(0)
+        self.home_btn.setChecked(True)
+        self.history_reader.verticalScrollBar().setValue(0)
+        if self.narrator:
+            self.read_current()
+
+    def render_history(self):
+        chapters = self.college.get("chapters", [])
+        esc = lambda value: html.escape(tr(value, self.lang))
+        px = lambda n: max(1, round(n * self.scale * self.theme.mult))
+        accent = "#ffe600" if self.theme.hc else "#f8c55a"
+        ink = "#ffffff" if self.theme.hc else "#f5f3eb"
+        body = "#ffffff" if self.theme.hc else "#d1e1dc"
+        self.story_period.setVisible(bool(chapters))
+        self.story_heading.setText(tr(self.college.get("heading"), self.lang) or self.T("welcome"))
+        parts = []
+        for chapter in chapters:
+            parts.append(
+                f'<p style="margin-top:{px(18)}px"><span style="color:{accent};font-size:{px(20)}px">'
+                f'{esc(chapter["period"])}</span></p>'
+                f'<p style="margin-top:{px(6)}px"><span style="color:{ink};font-size:{px(30)}px">'
+                f'<b>{esc(chapter["title"])}</b></span></p>'
+                f'<p style="margin-top:{px(10)}px;margin-bottom:{px(24)}px">'
+                f'<span style="color:{body};font-size:{px(25)}px">{esc(chapter["text"])}</span></p>')
+        self.history_reader.setHtml("".join(parts))
+
     # --- язык
     def set_language(self, lang):
         if lang not in LANGS:
             lang = "ru"
+        self.speaker.stop()
         self.lang = lang
         for code, b in self.lang_btns.items():
             b.setChecked(code == lang)
-        self.title_lbl.setText(self.title_for())
+        self.title_lbl.setText(self.title_for() if self.cfg.get("title") else tr(self.college.get("name"), lang) or self.title_for())
         self.sub_lbl.setText(self.T("subtitle"))
         self.exit_btn.setText("⏻   " + self.T("exit"))
-        self.welcome_txt.setText(self.T("welcome") if self.people else self.T("no_data"))
+        self.home_btn.setText(tr(self.college.get("history"), lang) or self.T("history"))
+        self.directors_btn.setText((tr(self.college.get("leaders"), lang) or self.T("subtitle")) + "   →")
+        self.home_btn.setChecked(self.stack.currentIndex() == 0)
+        self.render_history()
         self.card_head.setText(self.T("history"))
         self.arch_head.setText(self.T("archive"))
         self.btn_contrast.setText("◐  " + self.T("contrast"))
@@ -1287,6 +1358,8 @@ class Kiosk(QWidget):
         self.list.blockSignals(False)
         if 0 <= row < len(self.people):
             self.show_person(row)
+        if self.narrator:
+            self.read_current()
 
     # --- доступность
     def change_text_size(self, delta):
@@ -1301,7 +1374,7 @@ class Kiosk(QWidget):
         self.narrator = bool(checked)
         if not self.narrator:
             self.speaker.stop()
-        elif 0 <= self.list.currentRow() < len(self.people):
+        else:
             self.read_current()
 
     def person_text(self, p):
@@ -1318,6 +1391,8 @@ class Kiosk(QWidget):
         row = self.list.currentRow()
         if 0 <= row < len(self.people):
             self.speaker.speak(self.person_text(self.people[row]), self.lang)
+        elif self.stack.currentIndex() == 0:
+            self.speaker.speak(self.history_reader.toPlainText(), self.lang)
 
     def toggle_read(self):
         if self.speaker.is_speaking():
@@ -1330,9 +1405,12 @@ class Kiosk(QWidget):
         txt = ("⏹  " + self.T("stop")) if self.speaker.is_speaking() else ("🔊  " + self.T("read"))
         if force or self.read_btn.text() != txt:
             self.read_btn.setText(txt)
+            self.history_read.setText(txt)
 
     # --- поведение
     def _on_row(self, row):
+        self.speaker.stop()
+        self.home_btn.setChecked(row < 0)
         self.show_person(row)
         if self.narrator and 0 <= row < len(self.people):
             self.read_current()
@@ -1351,6 +1429,7 @@ class Kiosk(QWidget):
         self.desc.setText("".join(f"<p style='margin:0 0 {int(14 * self.scale)}px 0; line-height:140%'>{x}</p>"
                                   for x in paras))
         self._caps = p.captions(lang)
+        self.portrait.setVisible(bool(p.portrait))
         self.portrait.set_person(self.cache.get(p.portrait) if p.portrait else None, p.name(lang))
         self.strip.clear()
         for ph in p.photos:
@@ -1396,6 +1475,7 @@ class Kiosk(QWidget):
         self.list.blockSignals(True)
         self.list.setCurrentRow(-1)
         self.list.clearSelection()
+        self.list.scrollToTop()
         self.list.blockSignals(False)
         self.stack.setCurrentIndex(0)
         self.set_language(self.default_lang)
@@ -1459,7 +1539,176 @@ class Kiosk(QWidget):
 
 
 # ----------------------------------------------------------------- запуск
+def presentation_images(archive):
+    """Embedded pictures in slide order. Keep captions for the operator's review."""
+    def relationships(member):
+        rels = posixpath.join(posixpath.dirname(member), "_rels", posixpath.basename(member) + ".rels")
+        if rels not in archive.NameToInfo:
+            return {}
+        root = ET.fromstring(archive.read(rels))
+        result = {}
+        for rel in root:
+            if rel.get("TargetMode") == "External":
+                continue
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(member), rel.get("Target", ""))).lstrip("/")
+            if target in archive.NameToInfo:
+                result[rel.get("Id")] = target
+        return result
+
+    rel_id = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+    presentation = "ppt/presentation.xml"
+    slide_paths = relationships(presentation)
+    root = ET.fromstring(archive.read(presentation))
+    entries = []
+    for index, slide in enumerate(root.findall(".//{*}sldIdLst/{*}sldId"), 1):
+        path = slide_paths.get(slide.get(rel_id + "id"))
+        if not path:
+            continue
+        content = ET.fromstring(archive.read(path))
+        words = " ".join(n.text or "" for n in content.findall(".//{*}t"))
+        files = relationships(path)
+        seen = set()
+        for blip in content.findall(".//{*}blip"):
+            image = files.get(blip.get(rel_id + "embed"))
+            if image and image not in seen and Path(image).suffix.lower() in IMG_EXT:
+                seen.add(image)
+                entries.append((index, image, words))
+    return entries
+
+
+class CropPreview(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.image = QImage()
+        self.selection = QRect()
+        self.start = None
+        self.setMinimumSize(320, 200)
+
+    def image_rect(self):
+        size = self.image.size().scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        rect = QRect(QPoint(), size)
+        rect.moveCenter(self.rect().center())
+        return rect
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.fillRect(self.rect(), QColor("#122425"))
+        if not self.image.isNull():
+            p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+            p.drawImage(self.image_rect(), self.image)
+        if self.selection.isValid():
+            p.setPen(QPen(QColor("#ffce58"), 3))
+            p.drawRect(self.selection)
+
+    def resizeEvent(self, event):
+        self.selection = QRect()
+        super().resizeEvent(event)
+
+    def mousePressEvent(self, event):
+        point = event.position().toPoint()
+        if event.button() == Qt.MouseButton.LeftButton and self.image_rect().contains(point):
+            self.start = point
+            self.selection = QRect()
+            self.update()
+
+    def mouseMoveEvent(self, event):
+        if self.start is not None:
+            self.selection = QRect(self.start, event.position().toPoint()).normalized().intersected(self.image_rect())
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        self.mouseMoveEvent(event)
+        self.start = None
+        if self.selection.width() < 5 or self.selection.height() < 5:
+            self.selection = QRect()
+        self.update()
+
+    def cropped(self):
+        if self.selection.isEmpty():
+            return self.image
+        rect = self.image_rect()
+        selection = self.selection.translated(-rect.topLeft())
+        sx, sy = self.image.width() / rect.width(), self.image.height() / rect.height()
+        return self.image.copy(QRectF(selection.x()*sx, selection.y()*sy,
+                                      selection.width()*sx, selection.height()*sy).toAlignedRect())
+
+
+def import_portraits():
+    app = QApplication(sys.argv)
+    path, _ = QFileDialog.getOpenFileName(None, "Открыть презентацию колледжа", "", "PowerPoint (*.pptx)")
+    if not path:
+        return
+    people = load_people()
+    if not people:
+        QMessageBox.warning(None, "Портреты", "Папка data с карточками директоров не найдена.")
+        return
+    try:
+        with ZipFile(path) as archive:
+            entries = presentation_images(archive)
+            if not entries:
+                QMessageBox.information(None, "Портреты", "В слайдах не найдены встроенные фотографии.")
+                return
+            dialog = QDialog()
+            dialog.setWindowTitle("Портреты директоров из презентации")
+            dialog.resize(980, 700)
+            layout = QVBoxLayout(dialog)
+            layout.addWidget(QLabel("Выберите изображение. Чтобы вырезать портрет, обведите лицо и плечи мышью."))
+            images = QComboBox()
+            for slide, member, words in entries:
+                images.addItem(f"Слайд {slide} · {Path(member).name}   {words[:75]}")
+            layout.addWidget(images)
+            preview = CropPreview()
+            layout.addWidget(preview, 1)
+            row = QHBoxLayout()
+            directors = QComboBox()
+            directors.addItem("Выберите директора")
+            directors.addItems([person.name("ru") for person in people])
+            row.addWidget(directors, 1)
+            save = QPushButton("Сохранить портрет")
+            row.addWidget(save)
+            layout.addLayout(row)
+            status = QLabel()
+            layout.addWidget(status)
+
+            def select_image(index):
+                _, member, words = entries[index]
+                preview.image = QImage.fromData(archive.read(member))
+                preview.selection = QRect()
+                preview.start = None
+                preview.update()
+                candidates = [i for i, person in enumerate(people, 1)
+                              if person.folder.casefold() in words.casefold()]
+                directors.setCurrentIndex(candidates[0] if len(candidates) == 1 else 0)
+                status.setText("Изображение не читается." if preview.image.isNull() else "")
+                save.setEnabled(not preview.image.isNull())
+
+            def save_portrait():
+                index = directors.currentIndex() - 1
+                if index < 0:
+                    status.setText("Сначала выберите директора.")
+                    return
+                person = people[index]
+                target = DATA_DIR / person.folder / "portrait.jpg"
+                if target.exists() and QMessageBox.question(dialog, "Замена портрета", person.name("ru") + " — заменить портрет?") != QMessageBox.StandardButton.Yes:
+                    return
+                atomic_file = QSaveFile(str(target))
+                if (not atomic_file.open(QIODevice.OpenModeFlag.WriteOnly)
+                        or not preview.cropped().save(atomic_file, "JPEG", 94) or not atomic_file.commit()):
+                    status.setText("Ошибка записи портрета. Проверьте права на папку data.")
+                    return
+                status.setText("Портрет сохранён · " + person.name("ru"))
+
+            images.currentIndexChanged.connect(select_image)
+            save.clicked.connect(save_portrait)
+            select_image(0)
+            dialog.exec()
+    except (OSError, BadZipFile, KeyError, ET.ParseError, RuntimeError) as exc:
+        QMessageBox.warning(None, "Ошибка чтения презентации", str(exc))
+
+
 def main():
+    if sys.argv[1:] == ["--import-portraits"]:
+        return import_portraits()
     if len(sys.argv) >= 3 and sys.argv[1] == "--setpin":
         pin = sys.argv[2]
         if pin.isdigit() and 3 <= len(pin) <= 12:

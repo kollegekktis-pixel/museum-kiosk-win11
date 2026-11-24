@@ -1,0 +1,18 @@
+{
+  "order": 6,
+  "name": {
+    "ru": "Турсынов Рамазан Умирзакович",
+    "kk": "Турсынов Рамазан Умирзакович",
+    "en": "Ramazan Tursynov"
+  },
+  "years": {
+    "ru": "Период профессиональной школы",
+    "kk": "Кәсіптік мектеп кезеңі",
+    "en": "Vocational school period"
+  },
+  "description": {
+    "ru": "При Турсынове делопроизводство перевели на государственный язык. Согласно истории колледжа, в этот период трудоустройство выпускников достигло 100 процентов.",
+    "kk": "Турсынов басқарған кезде іс жүргізу мемлекеттік тілге көшірілді. Колледж тарихы туралы құжатта осы кезеңде түлектердің барлығы жұмысқа орналасқаны көрсетілген.",
+    "en": "Under Tursynov, the school switched its administrative records to Kazakh. The college history records that graduate employment reached 100 per cent during this period."
+  }
+}
