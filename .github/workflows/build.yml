@@ -14,10 +14,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install PyQt6 pyinstaller
+      - run: python -m unittest discover -s tests -v
       - run: python -m PyInstaller --noconsole --onefile museum.py
       - shell: pwsh
         run: |
           Copy-Item dist/museum.exe .
+          & "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/csc.exe" /nologo /codepage:65001 /target:winexe /reference:System.Windows.Forms.dll '/out:Обновить архив.exe' refresh_media.cs
+          if ($LASTEXITCODE -ne 0) { throw 'Updater build failed' }
+          $updater = Start-Process -FilePath '.\Обновить архив.exe' -ArgumentList '--quiet' -PassThru -Wait
+          if ($updater.ExitCode -ne 0 -or -not (Test-Path media-revision.txt)) { throw 'Updater failed' }
+          foreach ($person in (Get-ChildItem data -Directory)) {
+            if (-not (Test-Path (Join-Path $person.FullName 'Фото')) -or -not (Test-Path (Join-Path $person.FullName 'Видео'))) { throw 'Media folders missing' }
+          }
           $exe = (Resolve-Path museum.exe).Path
           $launcher = Start-Process -FilePath $exe -PassThru
           try {
@@ -35,7 +43,18 @@ jobs:
             Get-Process -Name museum -ErrorAction SilentlyContinue |
               Where-Object { $_.Path -eq $exe } | Stop-Process -Force
           }
-          Compress-Archive -Path museum.exe,museum.py,data,README.txt,build.bat,run_test.bat,import_portraits.bat -DestinationPath museum_kiosk_win11_x64.zip
+          $env:PYTHONUTF8 = '1'
+          $OutputEncoding = [Text.UTF8Encoding]::new($false)
+          @'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          files = ["museum.exe", "Обновить архив.exe", "museum.py", "refresh_media.cs",
+                   "README.txt", "build.bat", "run_test.bat", "import_portraits.bat"]
+          with ZipFile("museum_kiosk_win11_x64.zip", "w", ZIP_DEFLATED) as archive:
+              for path in [*map(Path, files), *Path("data").rglob("*")]:
+                  archive.write(path)
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { throw 'ZIP creation failed' }
           $releaseFlags = @()
           if ($env:GITHUB_REF_NAME -like "*-*") { $releaseFlags += "--prerelease" }
           gh release create $env:GITHUB_REF_NAME museum_kiosk_win11_x64.zip --verify-tag --title "Музей ККТиС · $env:GITHUB_REF_NAME" --generate-notes @releaseFlags

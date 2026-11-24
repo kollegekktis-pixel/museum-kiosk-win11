@@ -20,7 +20,7 @@ info.json (языки необязательны; если перевода не
     }
 Можно писать и просто строками: "years": "1965–1978".
 
-Смена пароля (только цифры):   museum.exe --setpin 5678
+Смена пароля: кнопка «Сменить PIN» в киоске после ввода действующего кода.
 Пароль по умолчанию:           1234
 Выход:  кнопка "Выход" внизу слева (или Ctrl+Shift+Q) -> пароль.
 """
@@ -43,14 +43,20 @@ from collections import OrderedDict
 from contextlib import contextmanager
 
 from PyQt6.QtCore import (Qt, QTimer, QEvent, QSize, QPoint, QRect, QSaveFile, QIODevice, QRectF,
-                          QEasingCurve, QVariantAnimation, pyqtSignal)
+                          QEasingCurve, QVariantAnimation, QLockFile, QUrl, pyqtSignal)
 from PyQt6.QtGui import (QPixmap, QImage, QImageReader, QPainter, QColor, QFont, QKeySequence, QShortcut,
-                         QPainterPath, QLinearGradient, QBrush, QPen, QFontMetrics)
+                         QPainterPath, QLinearGradient, QBrush, QPen, QFontMetrics, QRegion)
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
     QPushButton, QListWidget, QListWidgetItem, QStackedWidget, QScrollArea,
-    QScroller, QComboBox, QFileDialog, QMessageBox, QTextBrowser, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle,
+    QScroller, QComboBox, QFileDialog, QMessageBox, QTextBrowser, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle, QSlider,
 )
+
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QVideoSink
+
+VIDEO_EXT = {".mp4", ".m4v", ".mov", ".webm", ".mkv"}
+PHOTO_FOLDER = "Фото"
+VIDEO_FOLDER = "Видео"
 
 IMG_EXT = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 PORTRAIT_NAMES = {"portrait", "портрет", "director", "директор"}
@@ -66,12 +72,23 @@ LANGS = ("ru", "kk", "en")
 
 I18N = {
     "ru": {
+        "change_pin": "Сменить PIN",
+        "pin_current": "Введите действующий PIN",
+        "pin_new": "Новый PIN · 3–12 цифр",
+        "pin_confirm": "Повторите новый PIN",
+        "pin_length": "Введите от 3 до 12 цифр",
+        "pin_mismatch": "Коды различаются. Введите новый PIN ещё раз.",
+        "pin_saved": "PIN изменён",
+        "pin_file": "Проверьте доступ к config.json и действующий PIN.",
+        "media_error": "Не удалось воспроизвести это видео",
+        "play": "Воспроизвести",
+        "pause": "Пауза",
         "title": "Музей колледжа",
         "subtitle": "РУКОВОДИТЕЛИ КОЛЛЕДЖА",
         "welcome": "Выберите человека в списке слева\nи узнайте его историю",
         "no_data": "Папка data пуста или не найдена.\nДобавьте данные рядом с программой.",
         "history": "ИСТОРИЯ",
-        "archive": "АРХИВНЫЕ ФОТОГРАФИИ",
+        "archive": "ФОТО И ВИДЕО",
         "years": "Годы руководства",
         "exit": "Выход",
         "pin_title": "Введите пароль",
@@ -84,12 +101,23 @@ I18N = {
         "stop": "Остановить",
     },
     "kk": {
+        "change_pin": "PIN өзгерту",
+        "pin_current": "Қазіргі PIN кодын енгізіңіз",
+        "pin_new": "Жаңа PIN · 3–12 цифр",
+        "pin_confirm": "Жаңа PIN кодын қайталаңыз",
+        "pin_length": "3–12 цифр енгізіңіз",
+        "pin_mismatch": "Кодтар сәйкес келмеді. Жаңа PIN кодын қайта енгізіңіз.",
+        "pin_saved": "PIN сақталды",
+        "pin_file": "config.json файлына қатынасты және қазіргі PIN кодын тексеріңіз.",
+        "media_error": "Бұл бейнені ойнату мүмкін болмады",
+        "play": "Ойнату",
+        "pause": "Кідірту",
         "title": "Колледж мұражайы",
         "subtitle": "КОЛЛЕДЖ БАСШЫЛАРЫ",
         "welcome": "Сол жақтағы тізімнен адамды таңдаңыз\nжәне оның тарихын біліңіз",
         "no_data": "data қалтасы бос немесе табылмады.\nДеректерді бағдарламаның жанына қосыңыз.",
         "history": "ТАРИХ",
-        "archive": "МҰРАҒАТТЫҚ ФОТОЛАР",
+        "archive": "ФОТОСУРЕТТЕР МЕН БЕЙНЕЛЕР",
         "years": "Басшылық жылдары",
         "exit": "Шығу",
         "pin_title": "Құпиясөзді енгізіңіз",
@@ -102,12 +130,23 @@ I18N = {
         "stop": "Тоқтату",
     },
     "en": {
+        "change_pin": "Change PIN",
+        "pin_current": "Enter your current PIN",
+        "pin_new": "New PIN · 3–12 digits",
+        "pin_confirm": "Confirm the new PIN",
+        "pin_length": "Enter 3 to 12 digits",
+        "pin_mismatch": "The codes differ. Enter a new PIN again.",
+        "pin_saved": "PIN saved",
+        "pin_file": "Check access to config.json and the current PIN.",
+        "media_error": "This video could not be played",
+        "play": "Play",
+        "pause": "Pause",
         "title": "College Museum",
         "subtitle": "COLLEGE LEADERS",
         "welcome": "Select a person from the list\nto learn their story",
         "no_data": "The data folder is empty or not found.\nAdd data next to the program.",
         "history": "HISTORY",
-        "archive": "ARCHIVE PHOTOS",
+        "archive": "PHOTOS AND VIDEOS",
         "years": "Years in office",
         "exit": "Exit",
         "pin_title": "Enter password",
@@ -155,32 +194,59 @@ def hash_pin(pin: str, salt: str) -> str:
     return hashlib.sha256((salt + pin).encode("utf-8")).hexdigest()
 
 
-def save_config(cfg: dict):
-    CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+def atomic_write(path, data):
+    target = QSaveFile(str(path))
+    if not target.open(QIODevice.OpenModeFlag.WriteOnly):
+        raise OSError(target.errorString())
+    if target.write(data) != len(data) or not target.commit():
+        raise OSError(target.errorString())
 
 
-def load_config() -> dict:
-    cfg = {}
-    if CONFIG_PATH.exists():
-        try:
-            cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8-sig"))
-        except Exception:
-            cfg = {}
-    changed = False
-    if "salt" not in cfg or "pin_hash" not in cfg:
-        cfg["salt"] = secrets.token_hex(8)
-        cfg["pin_hash"] = hash_pin("1234", cfg["salt"])
-        changed = True
-    for key, val in (("hide_cursor", False), ("idle_reset_seconds", 120), ("language", "ru")):
-        if key not in cfg:
-            cfg[key] = val
-            changed = True
-    if changed:
-        try:
-            save_config(cfg)
-        except Exception:
-            pass
+def save_config(cfg):
+    atomic_write(CONFIG_PATH, json.dumps(cfg, ensure_ascii=False, indent=2).encode("utf-8"))
+
+
+@contextmanager
+def config_lock():
+    lock = QLockFile(str(CONFIG_PATH) + ".lock")
+    if not lock.tryLock(1500):
+        raise OSError("config.json занят или недоступен")
+    try:
+        yield
+    finally:
+        lock.unlock()
+
+
+def read_config():
+    cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8-sig"))
+    if (not isinstance(cfg, dict) or not isinstance(cfg.get("salt"), str) or not cfg["salt"]
+            or not re.fullmatch(r"[0-9a-f]{64}", str(cfg.get("pin_hash", "")))):
+        raise ValueError("Некорректные данные PIN в config.json")
     return cfg
+
+
+def load_config():
+    with config_lock():
+        if CONFIG_PATH.exists():
+            return read_config()
+        salt = secrets.token_hex(8)
+        cfg = dict(salt=salt, pin_hash=hash_pin("1234", salt), hide_cursor=False,
+                   idle_reset_seconds=120, language="ru")
+        save_config(cfg)
+        return cfg
+
+
+def replace_pin(current, new):
+    if not re.fullmatch(r"[0-9]{3,12}", new):
+        raise ValueError("Invalid PIN length")
+    with config_lock():
+        cfg = read_config()
+        if not secrets.compare_digest(hash_pin(current, cfg["salt"]), cfg["pin_hash"]):
+            raise ValueError("PIN changed")
+        cfg["salt"] = secrets.token_hex(8)
+        cfg["pin_hash"] = hash_pin(new, cfg["salt"])
+        save_config(cfg)
+        return cfg
 
 
 # ----------------------------------------------------------------- данные
@@ -189,10 +255,10 @@ def natural_key(s: str):
 
 
 class Person:
-    def __init__(self, folder, info, photos, portrait, sort_key):
+    def __init__(self, folder, info, media, portrait, sort_key):
         self.folder = folder
         self.info = info
-        self.photos = photos      # архивные фото
+        self.media = media       # общий архив карточки
         self.portrait = portrait  # портрет (или None)
         self.sort_key = sort_key
 
@@ -212,7 +278,35 @@ class Person:
 
     def captions(self, lang):
         caps = self.info.get("captions") or {}
-        return {k: tr(v, lang) for k, v in caps.items()}
+        folder = DATA_DIR / self.folder
+        labels = {}
+        for path in self.media:
+            key = path.relative_to(folder).as_posix()
+            caption = caps.get(key)
+            if caption is None and path.parent != folder and not (folder / path.name).exists():
+                caption = caps.get(path.name)
+            labels[path] = tr(caption, lang) or path.stem.replace("_", " ")
+        return labels
+
+
+def archive_files(folder, extensions):
+    if not folder.is_dir():
+        return []
+    return sorted((path for path in folder.iterdir() if path.is_file() and path.suffix.lower() in extensions),
+                  key=lambda path: natural_key(path.name))
+
+
+def create_media_folders():
+    folders = [d for d in DATA_DIR.iterdir() if d.is_dir()]
+    if not folders:
+        raise OSError("В папке data нет карточек директоров.")
+    for director in folders:
+        for name in (PHOTO_FOLDER, VIDEO_FOLDER):
+            (director / name).mkdir(exist_ok=True)
+
+
+def revision_path():
+    return DATA_DIR.parent / "media-revision.txt"
 
 
 def load_people():
@@ -236,8 +330,7 @@ def load_people():
                         "description": "\n".join(lines[1:]).strip()}
             except Exception:
                 info = {}
-        photos = sorted((p for p in d.iterdir() if p.suffix.lower() in IMG_EXT),
-                        key=lambda p: natural_key(p.name))
+        photos = archive_files(d, IMG_EXT)
         portrait = None
         wanted = str(info.get("portrait", "")).lower()
         for p in photos:
@@ -250,7 +343,8 @@ def load_people():
         order = info.get("order")
         sort_key = (order if isinstance(order, (int, float)) else (int(m.group()) if m else 9999),
                     natural_key(d.name))
-        people.append(Person(d.name, info, photos, portrait, sort_key))
+        media = archive_files(d / PHOTO_FOLDER, IMG_EXT) + archive_files(d / VIDEO_FOLDER, VIDEO_EXT)
+        people.append(Person(d.name, info, media + photos + archive_files(d, VIDEO_EXT), portrait, sort_key))
     people.sort(key=lambda p: p.sort_key)
     return people
 
@@ -450,7 +544,7 @@ class Speaker:
 
 # ----------------------------------------------------------------- виджеты
 class NavigationTransition(QWidget):
-    """Плавно убирает предыдущий кадр. Касания сразу получает новый экран."""
+    """Переход между двумя готовыми кадрами. Новая страница сразу принимает касания."""
 
     def __init__(self, kiosk):
         super().__init__(kiosk)
@@ -458,12 +552,13 @@ class NavigationTransition(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.hide()
-        self.frame = QPixmap()
-        self.offset = QPoint()
+        self.frame = self.incoming = self.hero = QPixmap()
+        self.mode = "page"
+        self.direction = 1
         self.animation = QVariantAnimation(self)
         self.animation.setStartValue(0.0)
         self.animation.setEndValue(1.0)
-        self.animation.setDuration(220)
+        self.animation.setDuration(390)
         self.animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
         self.animation.valueChanged.connect(lambda _: self.update())
         self.animation.finished.connect(self.clear)
@@ -475,7 +570,7 @@ class NavigationTransition(QWidget):
     def clear(self):
         self.animation.stop()
         self.hide()
-        self.frame = QPixmap()
+        self.frame = self.incoming = self.hero = QPixmap()
 
     def motion_enabled(self):
         if self.kiosk.theme.hc:
@@ -486,28 +581,101 @@ class NavigationTransition(QWidget):
         return bool(self.style().styleHint(QStyle.StyleHint.SH_Widget_Animate))
 
     @contextmanager
-    def switch(self, surface, dx=0, dy=0):
+    def switch(self, surface, mode="page", direction=1, path=None):
         if not surface.isVisible() or not self.motion_enabled():
             self.clear()
             yield
             return
         bounds = QRect(surface.mapTo(self.kiosk, QPoint()), surface.size())
-        # Снимок включает уже видимую часть прерванного перехода и фон страницы.
-        frame = self.kiosk.grab(bounds)
+        before = self.kiosk.grab(bounds)
         self.clear()
+        zoom = path is not None and path.suffix.lower() in IMG_EXT
+        origin = self.kiosk.media_origin(path) if zoom else QRect()
+        gallery = self.kiosk.overlay.gallery
+        target = gallery.photo_rect() if mode == "close" and zoom else QRect()
         yield
+        QApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        if mode == "open" and zoom:
+            target = gallery.photo_rect()
+        self.incoming = self.kiosk.grab(bounds)
+        self.frame = before
+        self.direction = direction
+        self.mode = mode
+        if mode in ("open", "close"):
+            self.hero = self.kiosk.cache.get(path) if zoom else QPixmap()
+            if origin.isEmpty() or target.isEmpty() or self.hero.isNull():
+                self.mode = "page"
+            else:
+                self.origin = QRectF(origin)
+                self.target = QRectF(target)
         self.setGeometry(bounds)
-        self.frame = frame
-        self.offset = QPoint(round(dx * self.kiosk.scale), round(dy * self.kiosk.scale))
+        self.animation.setDuration(430 if self.mode in ("open", "close") else 360)
         self.raise_()
         self.show()
         self.animation.start()
 
     def paintEvent(self, event):
-        progress = self.animation.currentValue()
-        painter = QPainter(self)
-        painter.setOpacity(1.0 - progress)
-        painter.drawPixmap(self.offset * progress, self.frame)
+        t = self.animation.currentValue()
+        p = QPainter(self)
+        if self.mode in ("open", "close"):
+            self.paint_zoom(p, t)
+        elif self.mode == "slide":
+            gap = max(2, round(12 * self.kiosk.scale))
+            stride = self.direction * (self.width() + gap)
+            x = round(-t * stride)
+            p.fillRect(self.rect(), QColor("#08172c"))
+            p.drawPixmap(x, 0, self.frame)
+            p.drawPixmap(x + stride, 0, self.incoming)
+        else:
+            # Новая страница раскрывается от края; буквы и портреты не наслаиваются.
+            w, h = self.width(), self.height()
+            forward = self.direction > 0
+            edge = round(w * (1-t if forward else t))
+            movement = self.direction * w * 0.06
+            p.drawPixmap(round(-movement * t), 0, self.frame)
+            p.save()
+            p.setClipRect(QRect(edge, 0, w-edge, h) if forward else QRect(0, 0, edge, h))
+            p.drawPixmap(round(movement * (1-t)), 0, self.incoming)
+            p.restore()
+            shade = self.direction * max(4, round(30 * self.kiosk.scale))
+            shadow = QLinearGradient(edge-shade, 0, edge, 0)
+            shadow.setColorAt(0, QColor(7, 28, 59, 0))
+            shadow.setColorAt(1, QColor(7, 28, 59, 65))
+            if 0 < edge < w:
+                p.fillRect(QRect(min(edge, edge-shade), 0, abs(shade), h), shadow)
+                p.fillRect(QRect(edge, 0, max(1, round(2*self.kiosk.scale)), h), QColor("#d7b169"))
+
+    def paint_zoom(self, p, t):
+        opening = self.mode == "open"
+        if not opening:
+            t = 1-t
+        base, full = (self.frame, self.incoming) if opening else (self.incoming, self.frame)
+        p.drawPixmap(0, 0, base)
+        if t <= 0:
+            return
+        if t >= 1:
+            p.drawPixmap(0, 0, full)
+            return
+        p.fillRect(self.rect(), QColor(8, 23, 44, round(255*t)))
+        p.save()
+        p.setClipRegion(QRegion(self.rect()).subtracted(QRegion(self.target.toAlignedRect())))
+        p.setOpacity(t)
+        p.drawPixmap(0, 0, full)
+        p.restore()
+        a, b = self.origin, self.target
+        rect = QRectF(a.x() + (b.x()-a.x())*t, a.y() + (b.y()-a.y())*t,
+                      a.width() + (b.width()-a.width())*t, a.height() + (b.height()-a.height())*t)
+        # Раскрываем центральный кроп миниатюры до полного кадра без искажения пропорций.
+        zoom = max(rect.width()/self.hero.width(), rect.height()/self.hero.height())
+        sw, sh = rect.width()/zoom, rect.height()/zoom
+        source = QRectF((self.hero.width()-sw)/2, (self.hero.height()-sh)*0.25, sw, sh)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        radius = 18 * self.kiosk.scale * (1-t)
+        shape = QPainterPath()
+        shape.addRoundedRect(rect, radius, radius)
+        p.setClipPath(shape)
+        p.drawPixmap(rect, self.hero, source)
 
 
 class PhotoView(QWidget):
@@ -519,10 +687,12 @@ class PhotoView(QWidget):
         self.radius = radius
         self._pm = None
         self._scaled = None
+        self.video_image = QImage()
         self._press = None
         self.setMinimumSize(300, 200)
 
     def set_pixmap(self, pm):
+        self.video_image = QImage()
         self._pm = pm
         self._rescale()
         self.update()
@@ -545,7 +715,13 @@ class PhotoView(QWidget):
         path.addRoundedRect(QRectF(self.rect()), self.radius, self.radius)
         p.setClipPath(path)
         p.fillRect(self.rect(), QColor("#08172c"))
-        if self._scaled is not None:
+        if not self.video_image.isNull():
+            size = self.video_image.size().scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            target = QRect(QPoint(), size)
+            target.moveCenter(self.rect().center())
+            p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+            p.drawImage(target, self.video_image)
+        elif self._scaled is not None:
             x = (self.width() - self._scaled.width()) // 2
             y = (self.height() - self._scaled.height()) // 2
             p.drawPixmap(x, y, self._scaled)
@@ -577,7 +753,27 @@ class GalleryPanel(QWidget):
 
         self.view = PhotoView(int(radius * scale))
         self.view.swiped.connect(self.step)
-        self.view.tapped.connect(self.tapped)
+        self.view.tapped.connect(self.view_tapped)
+        self.player = None
+        self.video_active = False
+        self.T = transition.kiosk.T
+        self.controls = QWidget()
+        controls = QHBoxLayout(self.controls)
+        controls.setContentsMargins(0, 0, 0, 0)
+        self.play_btn = QPushButton()
+        self.play_btn.setObjectName("tool")
+        self.play_btn.setMinimumHeight(round(54 * scale))
+        self.play_btn.clicked.connect(self.toggle_video)
+        self.seek = QSlider(Qt.Orientation.Horizontal)
+        self.seek.setAccessibleName("Video position")
+        self.seek.setRange(0, 0)
+        self.seek.sliderMoved.connect(lambda ms: self.player.setPosition(ms))
+        self.clock = QLabel("0:00 / 0:00")
+        self.clock.setObjectName("counter")
+        controls.addWidget(self.play_btn)
+        controls.addWidget(self.seek, 1)
+        controls.addWidget(self.clock)
+        self.controls.hide()
 
         btn = int(90 * scale)
         self.prev = QPushButton("‹")
@@ -609,7 +805,70 @@ class GalleryPanel(QWidget):
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(int(14 * scale))
         lay.addWidget(self.view, 1)
+        lay.addWidget(self.controls)
         lay.addLayout(bar)
+
+    def ensure_player(self):
+        if self.player is not None:
+            return
+        self.player = QMediaPlayer(self)
+        self.audio = QAudioOutput(self)
+        self.sink = QVideoSink(self)
+        self.player.setAudioOutput(self.audio)
+        self.player.setVideoSink(self.sink)
+        self.sink.videoFrameChanged.connect(self.video_frame)
+        self.player.playbackStateChanged.connect(lambda _: self.update_controls())
+        self.player.positionChanged.connect(lambda _: self.update_controls())
+        self.player.durationChanged.connect(lambda _: self.update_controls())
+        self.player.errorOccurred.connect(self.video_error)
+
+    def playing(self):
+        return self.player is not None and self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState
+
+    def video_frame(self, frame):
+        if self.video_active and frame.isValid():
+            self.view.video_image = frame.toImage()
+            self.view.update()
+
+    def video_error(self, error, message):
+        if self.video_active and error != QMediaPlayer.Error.NoError:
+            self.caption.setText(self.T("media_error") + " · " + self.photos[self.index].name)
+
+    def stop_video(self):
+        self.video_active = False
+        self.controls.hide()
+        if self.player and not self.player.source().isEmpty():
+            self.player.stop()
+            self.player.setSource(QUrl())
+        self.view.video_image = QImage()
+
+    def update_controls(self):
+        if not self.video_active:
+            return
+        pos, end = self.player.position(), self.player.duration()
+        if not self.seek.isSliderDown():
+            self.seek.setRange(0, max(0, end))
+            self.seek.setValue(pos)
+        self.seek.setEnabled(self.player.isSeekable())
+        def stamp(ms):
+            minutes, seconds = divmod(max(0, ms) // 1000, 60)
+            return f"{minutes}:{seconds:02d}"
+        self.clock.setText(stamp(pos) + " / " + stamp(end))
+        self.play_btn.setText(("Ⅱ  " + self.T("pause")) if self.playing() else ("▶  " + self.T("play")))
+
+    def toggle_video(self):
+        if self.playing():
+            self.player.pause()
+        elif self.video_active:
+            if self.player.mediaStatus() == QMediaPlayer.MediaStatus.EndOfMedia:
+                self.player.setPosition(0)
+            self.player.play()
+
+    def view_tapped(self):
+        if self.video_active:
+            self.toggle_video()
+        else:
+            self.tapped.emit()
 
     def set_photos(self, photos, captions, index=0):
         self.photos = list(photos)
@@ -617,6 +876,7 @@ class GalleryPanel(QWidget):
         self.show_index(index)
 
     def show_index(self, i):
+        self.stop_video()
         if not self.photos:
             self.view.set_pixmap(None)
             self.caption.setText("")
@@ -626,17 +886,36 @@ class GalleryPanel(QWidget):
             return
         self.index = i % len(self.photos)
         path = self.photos[self.index]
-        self.view.set_pixmap(self.cache.get(path))
-        self.caption.setText(str(self.captions.get(path.name, "")))
+        self.caption.setText(str(self.captions.get(path, "")))
+        if path.suffix.lower() in VIDEO_EXT:
+            self.transition.kiosk.speaker.stop()
+            self.view.set_pixmap(None)
+            self.ensure_player()
+            self.video_active = True
+            self.controls.show()
+            self.player.setSource(QUrl.fromLocalFile(str(path.resolve())))
+            self.update_controls()
+            self.player.play()
+        else:
+            self.view.set_pixmap(self.cache.get(path))
         self.counter.setText(f"{self.index + 1} / {len(self.photos)}")
         multi = len(self.photos) > 1
         self.prev.setVisible(multi)
         self.next.setVisible(multi)
         self.counter.setVisible(multi)
 
+    def photo_rect(self):
+        pm = self.view._scaled
+        if pm is None:
+            return QRect()
+        rect = QRect(QPoint(), pm.size())
+        rect.moveCenter(self.view.rect().center())
+        rect.translate(self.view.mapTo(self.transition.kiosk, QPoint()))
+        return rect
+
     def step(self, d):
         if len(self.photos) > 1:
-            with self.transition.switch(self.view, dx=-48 * d):
+            with self.transition.switch(self.view, "slide", d):
                 self.show_index(self.index + d)
 
 
@@ -661,9 +940,14 @@ class Overlay(QWidget):
         self.hide()
 
     def _close(self):
-        with self.transition.switch(self):
+        path = self.gallery.photos[self.gallery.index] if self.gallery.photos else None
+        with self.transition.switch(self, "close", -1, path):
             self.hide()
         self.closed.emit()
+
+    def hideEvent(self, event):
+        self.gallery.stop_video()
+        super().hideEvent(event)
 
     def resizeEvent(self, e):
         self.close_btn.move(self.width() - self.close_btn.width() - 20, 20)
@@ -764,8 +1048,24 @@ class ThumbDelegate(QStyledItemDelegate):
         clip = QPainterPath()
         clip.addRoundedRect(r, 18 * s, 18 * s)
         p.setClipPath(clip)
-        p.drawPixmap(int(r.left()), int(r.top()), self.thumbs.get(path, w, h))
-        cap = self.captions_getter().get(path.name, "")
+        if path.suffix.lower() in VIDEO_EXT:
+            gradient = QLinearGradient(r.topLeft(), r.bottomRight())
+            gradient.setColorAt(0, QColor("#153f77"))
+            gradient.setColorAt(1, QColor("#08172c"))
+            p.fillRect(r, gradient)
+            center = r.center()
+            p.setPen(QPen(QColor("#e5be72"), 2 * s))
+            p.setBrush(QColor("#102e54"))
+            p.drawEllipse(center, 36 * s, 36 * s)
+            play = QPainterPath()
+            play.moveTo(center.x() - 8*s, center.y() - 13*s)
+            play.lineTo(center.x() + 14*s, center.y())
+            play.lineTo(center.x() - 8*s, center.y() + 13*s)
+            play.closeSubpath()
+            p.fillPath(play, QColor("#fff4da"))
+        else:
+            p.drawPixmap(int(r.left()), int(r.top()), self.thumbs.get(path, w, h))
+        cap = self.captions_getter().get(path, "")
         if cap:
             f = QFont("Segoe UI")
             f.setPixelSize(int(18 * s * self.theme.mult))
@@ -891,22 +1191,24 @@ class PersonDelegate(QStyledItemDelegate):
 
 
 class PinDialog(QDialog):
-    def __init__(self, parent, verify, scale, hc, T):
+    def __init__(self, parent, verify, scale, hc, T, change=False):
         super().__init__(parent)
         self.verify = verify
         self.scale = scale
         self.hc = hc
         self.T = T
         self.pin = ""
+        self.stage = "current" if change else "exit"
+        self.current_pin = self.new_pin = ""
         self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint |
                             Qt.WindowType.WindowStaysOnTopHint)
         self.setModal(True)
         self.setObjectName("pin")
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
-        title = QLabel(T("pin_title"))
-        title.setObjectName("pinTitle")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title = QLabel(T("pin_current" if change else "pin_title"))
+        self.title.setObjectName("pinTitle")
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.display = QLabel(" ")
         self.display.setObjectName("pinDisplay")
         self.display.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -931,7 +1233,7 @@ class PinDialog(QDialog):
 
         lay = QVBoxLayout(self)
         lay.setContentsMargins(int(30 * scale), int(30 * scale), int(30 * scale), int(30 * scale))
-        lay.addWidget(title)
+        lay.addWidget(self.title)
         lay.addWidget(self.display)
         lay.addWidget(self.status)
         lay.addLayout(grid)
@@ -963,13 +1265,47 @@ class PinDialog(QDialog):
         self.display.setText("●" * len(self.pin) if self.pin else " ")
 
     def submit(self):
-        res = self.verify(self.pin)
-        if res == "ok":
-            self.accept()
-            return
-        self.pin = ""
+        entry, self.pin = self.pin, ""
         self.display.setText(" ")
-        self.status.setText(self.T("pin_locked") if res == "locked" else self.T("pin_bad"))
+        self.status.setText(" ")
+        if self.stage in ("exit", "current"):
+            res = self.verify(entry)
+            if res != "ok":
+                self.status.setText(self.T({"bad": "pin_bad", "locked": "pin_locked"}.get(res, "pin_file")))
+                return
+            if self.stage == "exit":
+                self.accept()
+                return
+            self.current_pin = entry
+            self.stage = "new"
+            self.title.setText(self.T("pin_new"))
+        elif self.stage == "new":
+            if not re.fullmatch(r"[0-9]{3,12}", entry):
+                self.status.setText(self.T("pin_length"))
+                return
+            self.new_pin = entry
+            self.stage = "confirm"
+            self.title.setText(self.T("pin_confirm"))
+        elif entry != self.new_pin:
+            self.new_pin = ""
+            self.stage = "new"
+            self.title.setText(self.T("pin_new"))
+            self.status.setText(self.T("pin_mismatch"))
+        else:
+            try:
+                self.parentWidget().cfg = replace_pin(self.current_pin, entry)
+            except (ValueError, OSError):
+                self.current_pin = self.new_pin = ""
+                self.stage = "current"
+                self.title.setText(self.T("pin_current"))
+                self.status.setText(self.T("pin_file"))
+                return
+            self.accept()
+
+    def done(self, result):
+        self.current_pin = self.new_pin = self.pin = ""
+        self._auto.stop()
+        super().done(result)
 
     def keyPressEvent(self, e):
         t = e.text()
@@ -985,7 +1321,7 @@ class PinDialog(QDialog):
 
 # ----------------------------------------------------------------- главное окно
 class Kiosk(QWidget):
-    def __init__(self, cfg, people, scale):
+    def __init__(self, cfg, people, scale, media_revision=None):
         super().__init__()
         self.cfg = cfg
         college_file = DATA_DIR / "college.json"
@@ -1027,13 +1363,49 @@ class Kiosk(QWidget):
         self.sp_timer.timeout.connect(self.update_read_btn)
         self.sp_timer.start()
 
-        secs = int(cfg.get("idle_reset_seconds", 0) or 0)
+        secs = int(cfg.get("idle_reset_seconds", 120) or 0)
         self.idle = QTimer(self)
         self.idle.setSingleShot(True)
         if secs > 0:
             self.idle.setInterval(secs * 1000)
-            self.idle.timeout.connect(self.go_home)
+            self.idle.timeout.connect(self.on_idle)
             self.idle.start()
+
+        self.last_revision = media_revision
+        self.media_timer = QTimer(self)
+        self.media_timer.timeout.connect(self.check_media_revision)
+        self.media_timer.start(1200)
+
+    def check_media_revision(self):
+        if self._pin_open or self.overlay.isVisible():
+            return
+        try:
+            token = revision_path().read_bytes()
+            if not token or token == self.last_revision:
+                return
+            updated = load_people()
+        except OSError:
+            return
+        row = self.list.currentRow()
+        folder = self.people[row].folder if 0 <= row < len(self.people) else None
+        self.people = updated
+        self.cache.d.clear()
+        self.thumbs.d.clear()
+        self.transition.clear()
+        selected = next((i for i, p in enumerate(updated) if p.folder == folder), -1)
+        self.list.blockSignals(True)
+        self.list.setCurrentRow(-1)
+        self.list.blockSignals(False)
+        self.stack.setCurrentIndex(0)
+        self.set_language(self.lang, selected)
+        self.directors_btn.setEnabled(bool(updated))
+        self.last_revision = token
+
+    def on_idle(self):
+        if self.overlay.isVisible() and self.overlay.gallery.playing():
+            self.idle.start()
+        elif not self._pin_open:
+            self.go_home()
 
     # --- тексты
     def T(self, key):
@@ -1120,7 +1492,12 @@ class Kiosk(QWidget):
         self.exit_btn.setMinimumHeight(int(68 * s))
         self.exit_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.exit_btn.clicked.connect(self.ask_password)
-        lv.addWidget(self.exit_btn)
+        self.pin_btn = self._tool_button("")
+        self.pin_btn.clicked.connect(lambda: self.ask_password(change=True))
+        account_buttons = QHBoxLayout()
+        account_buttons.addWidget(self.pin_btn, 1)
+        account_buttons.addWidget(self.exit_btn, 1)
+        lv.addLayout(account_buttons)
 
         # ---- правая часть: панель инструментов + страницы
         rightw = QWidget()
@@ -1413,7 +1790,7 @@ class Kiosk(QWidget):
         with self.transition.switch(self.stack):
             self.set_language(lang)
 
-    def set_language(self, lang):
+    def set_language(self, lang, selected=None):
         if lang not in LANGS:
             lang = "ru"
         self.speaker.stop()
@@ -1422,6 +1799,7 @@ class Kiosk(QWidget):
             b.setChecked(code == lang)
         self.title_lbl.setText(self.title_for() if self.cfg.get("title") else tr(self.college.get("name"), lang) or self.title_for())
         self.sub_lbl.setText(self.T("subtitle"))
+        self.pin_btn.setText(self.T("change_pin"))
         self.exit_btn.setText("⏻   " + self.T("exit"))
         self.home_btn.setText(tr(self.college.get("history"), lang) or self.T("history"))
         self.directors_btn.setText((tr(self.college.get("leaders"), lang) or self.T("subtitle")) + "   →")
@@ -1432,7 +1810,7 @@ class Kiosk(QWidget):
         self.btn_contrast.setText("◐  " + self.T("contrast"))
         self.btn_narr.setText("🔊  " + self.T("narrator"))
         self.update_read_btn(force=True)
-        row = self.list.currentRow()
+        row = self.list.currentRow() if selected is None else selected
         self.list.blockSignals(True)
         self.list.clear()
         for p in self.people:
@@ -1447,6 +1825,7 @@ class Kiosk(QWidget):
         self.list.blockSignals(False)
         if 0 <= row < len(self.people):
             self.show_person(row)
+        self.home_btn.setChecked(self.stack.currentIndex() == 0)
         if self.narrator:
             self.read_current()
 
@@ -1502,7 +1881,7 @@ class Kiosk(QWidget):
         row = self.list.row(current)
         previous_row = self.list.row(previous)
         self.home_btn.setChecked(row < 0)
-        with self.transition.switch(self.stack, dy=-22 if row > previous_row else 22):
+        with self.transition.switch(self.stack, direction=1 if row > previous_row else -1):
             self.show_person(row)
         if self.narrator and 0 <= row < len(self.people):
             self.read_current()
@@ -1525,18 +1904,43 @@ class Kiosk(QWidget):
         self.portrait.setVisible(bool(p.portrait))
         self.portrait.set_person(self.cache.get(p.portrait) if p.portrait else None, p.name(lang))
         self.strip.clear()
-        for ph in p.photos:
+        for ph in p.media:
             it = QListWidgetItem()
             it.setData(Qt.ItemDataRole.UserRole, ph)
             self.strip.addItem(it)
         self.strip.horizontalScrollBar().setValue(0)
-        has = bool(p.photos)
+        has = bool(p.media)
         self.arch_head.setVisible(has)
         self.strip.setVisible(has)
         self.stack.setCurrentIndex(1)
 
+    def media_origin(self, path):
+        row = self.list.currentRow()
+        if row < 0:
+            return QRect()
+        person = self.people[row]
+        if path == person.portrait:
+            rect = self.portrait.rect().adjusted(3, 3, -3, -3)
+            rect.translate(self.portrait.mapTo(self, QPoint()))
+            return rect
+        if path not in person.media:
+            return QRect()
+        item = self.strip.item(person.media.index(path))
+        if item is None:
+            return QRect()
+        cell = self.strip.visualItemRect(item)
+        start = cell.topLeft() + QPoint(round(9*self.scale), round(4*self.scale))
+        rect = QRect(start, QSize(*self.thumb_size))
+        viewport = self.strip.viewport()
+        if not viewport.rect().contains(rect):
+            return QRect()
+        rect.translate(viewport.mapTo(self, QPoint()))
+        return rect
+
     def _show_overlay(self, photos, captions, index):
-        with self.transition.switch(self):
+        if not photos:
+            return
+        with self.transition.switch(self, "open", path=photos[index % len(photos)]):
             self.overlay.gallery.set_photos(photos, captions, index)
             self.overlay.setGeometry(self.rect())
             self.overlay.show()
@@ -1544,9 +1948,9 @@ class Kiosk(QWidget):
 
     def open_overlay(self, index=0):
         row = self.list.currentRow()
-        if 0 <= row < len(self.people) and self.people[row].photos:
+        if 0 <= row < len(self.people) and self.people[row].media:
             p = self.people[row]
-            self._show_overlay(p.photos, p.captions(self.lang), index)
+            self._show_overlay(p.media, p.captions(self.lang), index)
 
     def open_portrait(self):
         row = self.list.currentRow()
@@ -1590,10 +1994,14 @@ class Kiosk(QWidget):
 
     # --- пароль и выход
     def _verify(self, pin):
-        now = time.time()
+        now = time.monotonic()
         if now < self._locked_until:
             return "locked"
-        if hash_pin(pin, self.cfg["salt"]) == self.cfg["pin_hash"]:
+        try:
+            current = read_config()
+        except (OSError, ValueError):
+            return "error"
+        if secrets.compare_digest(hash_pin(pin, current["salt"]), current["pin_hash"]):
             self._fails = 0
             return "ok"
         self._fails += 1
@@ -1603,7 +2011,7 @@ class Kiosk(QWidget):
             return "locked"
         return "bad"
 
-    def ask_password(self):
+    def ask_password(self, change=False):
         if self._pin_open:
             return
         self.transition.clear()
@@ -1611,13 +2019,19 @@ class Kiosk(QWidget):
         self.dim.setGeometry(self.rect())
         self.dim.show()
         self.dim.raise_()
-        dlg = PinDialog(self, self._verify, self.scale, self.theme.hc, self.T)
+        dlg = PinDialog(self, self._verify, self.scale, self.theme.hc, self.T, change)
         dlg.adjustSize()
         dlg.move(self.geometry().center() - dlg.rect().center())
         ok = dlg.exec() == QDialog.DialogCode.Accepted
+        dlg.deleteLater()
         self.dim.hide()
         self._pin_open = False
-        if ok:
+        if self.idle.interval() > 0:
+            self.idle.start()
+        if ok and change:
+            self.pin_btn.setText(self.T("pin_saved"))
+            QTimer.singleShot(2500, lambda: self.pin_btn.setText(self.T("change_pin")))
+        elif ok:
             self.shutdown()
 
     def shutdown(self):
@@ -1805,18 +2219,34 @@ def import_portraits():
 def main():
     if sys.argv[1:] == ["--import-portraits"]:
         return import_portraits()
-    if len(sys.argv) >= 3 and sys.argv[1] == "--setpin":
-        pin = sys.argv[2]
-        if pin.isdigit() and 3 <= len(pin) <= 12:
-            cfg = load_config()
-            cfg["salt"] = secrets.token_hex(8)
-            cfg["pin_hash"] = hash_pin(pin, cfg["salt"])
-            save_config(cfg)
-        return
-
-    cfg = load_config()
-    people = load_people()
     app = QApplication(sys.argv)
+    if sys.argv[1:2] == ["--refresh-media"]:
+        try:
+            create_media_folders()
+            atomic_write(revision_path(), secrets.token_hex(16).encode("ascii"))
+        except OSError as error:
+            if "--quiet" not in sys.argv:
+                QMessageBox.warning(None, "Обновить архив", str(error))
+            return 1
+        if "--quiet" not in sys.argv:
+            notice = QMessageBox(QMessageBox.Icon.Information, "Обновить архив",
+                                 "Готово. Откройте карточку директора, чтобы посмотреть фото и видео.")
+            QTimer.singleShot(3500, notice.accept)
+            notice.exec()
+        return 0
+    if sys.argv[1:2] == ["--setpin"]:
+        QMessageBox.information(None, "Музей", "Для смены кода нажмите «Сменить PIN» в киоске и введите действующий PIN.")
+        return 1
+    try:
+        cfg = load_config()
+    except (OSError, ValueError) as error:
+        QMessageBox.critical(None, "Музей", "Не удалось прочитать или создать config.json.\n" + str(error))
+        return 1
+    try:
+        media_revision = revision_path().read_bytes()
+    except OSError:
+        media_revision = None
+    people = load_people()
     app.setFont(QFont("Segoe UI"))
     scr = app.primaryScreen()
     sz = scr.size()  # логические пиксели (с учётом масштаба Windows)
@@ -1825,7 +2255,7 @@ def main():
     global MAX_SIDE
     MAX_SIDE = int(max(sz.width(), sz.height()) * scr.devicePixelRatio())
 
-    win = Kiosk(cfg, people, scale)
+    win = Kiosk(cfg, people, scale, media_revision)
     app.installEventFilter(win)
     win.showFullScreen()
     win.lock = install_keyboard_lock()
@@ -1833,4 +2263,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
