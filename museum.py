@@ -49,7 +49,7 @@ from PyQt6.QtGui import (QPixmap, QImage, QImageReader, QPainter, QColor, QFont,
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
     QPushButton, QListWidget, QListWidgetItem, QStackedWidget, QScrollArea,
-    QScroller, QComboBox, QFileDialog, QMessageBox, QTextBrowser, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle, QSlider,
+    QScroller, QComboBox, QFileDialog, QMessageBox, QTextBrowser, QDialog, QFrame, QAbstractItemView, QStyledItemDelegate, QStyle, QSlider, QMenu, QToolTip,
 )
 
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QVideoSink
@@ -1487,17 +1487,17 @@ class Kiosk(QWidget):
         self.list.currentItemChanged.connect(self._on_item)
         lv.addWidget(self.list, 1)
 
-        self.exit_btn = QPushButton()
-        self.exit_btn.setObjectName("exitBtn")
-        self.exit_btn.setMinimumHeight(int(68 * s))
-        self.exit_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.exit_btn.clicked.connect(self.ask_password)
-        self.pin_btn = self._tool_button("")
-        self.pin_btn.clicked.connect(lambda: self.ask_password(change=True))
-        account_buttons = QHBoxLayout()
-        account_buttons.addWidget(self.pin_btn, 1)
-        account_buttons.addWidget(self.exit_btn, 1)
-        lv.addLayout(account_buttons)
+        self.menu_btn = QPushButton("☰")
+        self.menu_btn.setObjectName("menuBtn")
+        self.menu_btn.setFixedSize(round(70*s), round(70*s))
+        self.account_menu = QMenu(self.menu_btn)
+        self.account_menu.setObjectName("accountMenu")
+        self.pin_action = self.account_menu.addAction("")
+        self.exit_action = self.account_menu.addAction("")
+        self.pin_action.triggered.connect(lambda: self.ask_password(change=True))
+        self.exit_action.triggered.connect(lambda: self.ask_password())
+        self.menu_btn.clicked.connect(self.open_account_menu)
+        lv.addWidget(self.menu_btn, 0, Qt.AlignmentFlag.AlignLeft)
 
         # ---- правая часть: панель инструментов + страницы
         rightw = QWidget()
@@ -1696,9 +1696,13 @@ class Kiosk(QWidget):
         #title {{ font-size:{ff(34)}px; font-weight:700; color:{side_text}; }}
         #subtitle {{ font-size:{ff(15)}px; font-weight:600; color:{side_accent}; }}
         QListWidget {{ background:transparent; outline:0; border:none; }}
-        #exitBtn {{ background:{side_button}; border:{P.bw}px solid {side_border}; border-radius:{f(20)}px;
-                   font-size:{ff(24)}px; font-weight:600; color:{side_text}; }}
-        #exitBtn:pressed {{ background:#ef4444; border-color:#ef4444; color:#ffffff; }}
+        #menuBtn {{ background:{side_button}; color:{side_accent}; border:{P.bw}px solid {side_accent};
+                    border-radius:{f(18)}px; font-size:{f(33)}px; }}
+        #menuBtn:pressed, #menuBtn:focus {{ border:{max(2,P.bw)}px solid {side_accent}; }}
+        QMenu#accountMenu {{ background:{side_button}; color:{side_text}; border:{P.bw}px solid {side_accent};
+                             padding:{f(6)}px; font-size:{ff(23)}px; }}
+        QMenu#accountMenu::item {{ padding:{f(17)}px {f(28)}px; color:{side_text}; }}
+        QMenu#accountMenu::item:selected {{ background:{side_accent}; color:#102f63; }}
         #tool {{ background:{P.btn}; border:{P.bw}px solid {P.btn_b}; border-radius:{f(18)}px;
                 font-size:{ff(22)}px; font-weight:600; color:{P.text}; padding:0 {f(18)}px; }}
         #tool:checked {{ background:{P.chk}; color:{P.chk_t}; border-color:{P.chk}; }}
@@ -1799,8 +1803,9 @@ class Kiosk(QWidget):
             b.setChecked(code == lang)
         self.title_lbl.setText(self.title_for() if self.cfg.get("title") else tr(self.college.get("name"), lang) or self.title_for())
         self.sub_lbl.setText(self.T("subtitle"))
-        self.pin_btn.setText(self.T("change_pin"))
-        self.exit_btn.setText("⏻   " + self.T("exit"))
+        self.menu_btn.setAccessibleName({"ru": "Меню", "kk": "Мәзір", "en": "Menu"}[lang])
+        self.pin_action.setText(self.T("change_pin"))
+        self.exit_action.setText(self.T("exit"))
         self.home_btn.setText(tr(self.college.get("history"), lang) or self.T("history"))
         self.directors_btn.setText((tr(self.college.get("leaders"), lang) or self.T("subtitle")) + "   →")
         self.home_btn.setChecked(self.stack.currentIndex() == 0)
@@ -1959,6 +1964,7 @@ class Kiosk(QWidget):
 
     def go_home(self):
         """Бездействие: сброс к начальному экрану, языку и настройкам доступности."""
+        self.account_menu.close()
         self.transition.clear()
         self.speaker.stop()
         self.overlay.hide()
@@ -1987,8 +1993,12 @@ class Kiosk(QWidget):
             self.idle.start()
         return False
 
+    def open_account_menu(self):
+        height = self.account_menu.sizeHint().height()
+        self.account_menu.popup(self.menu_btn.mapToGlobal(QPoint(0, -height - round(8*self.scale))))
+
     def _keep_top(self):
-        if not self._pin_open:
+        if not self._pin_open and not self.account_menu.isVisible():
             self.raise_()
             self.activateWindow()
 
@@ -2014,6 +2024,7 @@ class Kiosk(QWidget):
     def ask_password(self, change=False):
         if self._pin_open:
             return
+        self.account_menu.close()
         self.transition.clear()
         self._pin_open = True
         self.dim.setGeometry(self.rect())
@@ -2029,8 +2040,7 @@ class Kiosk(QWidget):
         if self.idle.interval() > 0:
             self.idle.start()
         if ok and change:
-            self.pin_btn.setText(self.T("pin_saved"))
-            QTimer.singleShot(2500, lambda: self.pin_btn.setText(self.T("change_pin")))
+            QToolTip.showText(self.menu_btn.mapToGlobal(QPoint()), self.T("pin_saved"), self.menu_btn)
         elif ok:
             self.shutdown()
 
