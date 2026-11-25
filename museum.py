@@ -270,8 +270,8 @@ class Person:
 
     def period_text(self, lang):
         years = self.years(lang)
-        label = tr(self.info.get("period_label"), lang) or I18N[lang]["years"]
-        return f"{label}: {years}" if years else ""
+        label = tr(self.info.get("period_label", I18N[lang]["years"]), lang)
+        return f"{label}: {years}" if label and years else years
 
     def description(self, lang):
         return tr(self.info.get("description"), lang)

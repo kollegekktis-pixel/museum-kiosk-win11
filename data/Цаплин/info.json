@@ -39,11 +39,7 @@
       "en": "The first school building, 5a Ippodromnaya Street"
     }
   },
-  "period_label": {
-    "ru": "Период стенда",
-    "kk": "Стенд қамтитын кезең",
-    "en": "Exhibit period"
-  },
+  "period_label": "",
   "date_source": {
     "document": "На проверку стнеды (1).pdf",
     "page": 5
